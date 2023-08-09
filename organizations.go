@@ -53,15 +53,15 @@ func (t *TransifexApiClient) ListOrganizations() ([]Organization, error) {
 		"GET",
 		strings.Join([]string{
 			t.apiURL,
-			"organizations",
-		}, "/"),
+			"/organizations",
+		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
 		t.l.Error(err)
 		return nil, err
 	}
 
-	// Set authorayztion and Accept HTTP request headers
+	// Set authorization and Accept HTTP request headers
 	req.Header.Set("Authorization", "Bearer "+t.token)
 	req.Header.Add("Accept", "application/vnd.api+json")
 
@@ -96,9 +96,9 @@ func (t *TransifexApiClient) GetOrganizationDetails(id string) (Organization, er
 		"GET",
 		strings.Join([]string{
 			t.apiURL,
-			"organizations",
+			"/organizations/",
 			id,
-		}, "/"),
+		}, ""),
 		bytes.NewBuffer(nil),
 	)
 	if err != nil {
@@ -106,7 +106,7 @@ func (t *TransifexApiClient) GetOrganizationDetails(id string) (Organization, er
 		return Organization{}, err
 	}
 
-	// Set authorayztion and Accept HTTP request headers
+	// Set authorization and Accept HTTP request headers
 	req.Header.Set("Authorization", "Bearer "+t.token)
 	req.Header.Add("Accept", "application/vnd.api+json")
 
@@ -130,12 +130,12 @@ func (t *TransifexApiClient) GetOrganizationDetails(id string) (Organization, er
 // The function prints the information about an organization
 func (t *TransifexApiClient) PrintOrganization(o Organization) {
 
-	fmt.Println("@@@@@@@@@@@@ Organization information @@@@@@@@@@@@")
-	fmt.Printf("  ID:   %v\n", o.ID)
+	fmt.Printf("Organization information:\n")
+	fmt.Printf("  ID: %v\n", o.ID)
 	fmt.Printf("  Type: %v\n", o.Type)
 	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Name:    %v\n", o.Attributes.Name)
-	fmt.Printf("    Slug:    %v\n", o.Attributes.Slug)
+	fmt.Printf("    Name: %v\n", o.Attributes.Name)
+	fmt.Printf("    Slug: %v\n", o.Attributes.Slug)
 	fmt.Printf("    LogoURL: %v\n", o.Attributes.LogoURL)
 	fmt.Printf("    Private: %v\n", o.Attributes.Private)
 	fmt.Printf("  Links:\n")
@@ -147,5 +147,4 @@ func (t *TransifexApiClient) PrintOrganization(o Organization) {
 	fmt.Printf("    Teams:\n")
 	fmt.Printf("      Links:\n")
 	fmt.Printf("        Related: %v\n", o.Relationships.Teams.Links.Related)
-	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 }
