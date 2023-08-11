@@ -150,6 +150,7 @@ func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, er
 // The function prints the information about an resource
 func (t *TransifexApiClient) PrintResource(r Resource) {
 
+	fmt.Printf("Resource information:\n")
 	fmt.Printf("  ID: %v\n", r.ID)
 	fmt.Printf("  Type: %v\n", r.Type)
 	fmt.Printf("  Attributes:\n")
