@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -208,56 +209,65 @@ func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resourceStringID stri
 }
 
 // The function prints the information about a resource string
-func (t *TransifexApiClient) PrintResourseString(s ResourceString) {
+func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter string) {
 
-	fmt.Printf("Resource string information:\n")
+	switch formatter {
+	case "text":
+		fmt.Printf("  Type: %v\n", s.Type)
+		fmt.Printf("  ID: %v\n", s.ID)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    AppearanceOrder: %v\n", s.Attributes.AppearanceOrder)
+		fmt.Printf("    Key: %v\n", s.Attributes.Key)
+		fmt.Printf("    Context: %v\n", s.Attributes.Context)
+		fmt.Printf("    Strings:\n")
+		fmt.Printf("      Other: %v\n", s.Attributes.Strings.Other)
 
-	fmt.Printf("  Type: %v\n", s.Type)
-	fmt.Printf("  ID: %v\n", s.ID)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    AppearanceOrder: %v\n", s.Attributes.AppearanceOrder)
-	fmt.Printf("    Key: %v\n", s.Attributes.Key)
-	fmt.Printf("    Context: %v\n", s.Attributes.Context)
-	fmt.Printf("    Strings:\n")
-	fmt.Printf("      Other: %v\n", s.Attributes.Strings.Other)
-
-	// !ToDo: Check the Tags type
-	if len(s.Attributes.Tags) > 0 {
-		fmt.Printf("    Tags:\n")
-		for _, v := range s.Attributes.Tags {
-			fmt.Printf("      - %v\n", v)
+		// !ToDo: Check the Tags type
+		if len(s.Attributes.Tags) > 0 {
+			fmt.Printf("    Tags:\n")
+			for _, v := range s.Attributes.Tags {
+				fmt.Printf("      - %v\n", v)
+			}
 		}
+
+		fmt.Printf("    Occurrences: %v\n", s.Attributes.Occurrences)
+		fmt.Printf("    DeveloperComment: %v\n", s.Attributes.DeveloperComment)
+		fmt.Printf("    Instructions: %v\n", s.Attributes.Instructions)
+		fmt.Printf("    CharacterLimit: %v\n", s.Attributes.CharacterLimit)
+		fmt.Printf("    Pluralized: %v\n", s.Attributes.Pluralized)
+		fmt.Printf("    StringHash: %v\n", s.Attributes.StringHash)
+		fmt.Printf("    DatetimeCreated: %v\n", s.Attributes.DatetimeCreated)
+		fmt.Printf("    MetadataDatetimeModified: %v\n", s.Attributes.MetadataDatetimeModified)
+		fmt.Printf("    StringsDatetimeModified: %v\n", s.Attributes.StringsDatetimeModified)
+
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Resource:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", s.Relationships.Resource.Data.Type)
+		fmt.Printf("        ID: %v\n", s.Relationships.Resource.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", s.Relationships.Resource.Links.Related)
+		fmt.Printf("    Language:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", s.Relationships.Language.Data.Type)
+		fmt.Printf("        ID: %v\n", s.Relationships.Language.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", s.Relationships.Language.Links.Related)
+		fmt.Printf("    Committer:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", s.Relationships.Committer.Data.Type)
+		fmt.Printf("        ID: %v\n", s.Relationships.Committer.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", s.Relationships.Committer.Links.Related)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", s.Links.Self)
+	case "json":
+		text2print, err := json.Marshal(s)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
 	}
-
-	fmt.Printf("    Occurrences: %v\n", s.Attributes.Occurrences)
-	fmt.Printf("    DeveloperComment: %v\n", s.Attributes.DeveloperComment)
-	fmt.Printf("    Instructions: %v\n", s.Attributes.Instructions)
-	fmt.Printf("    CharacterLimit: %v\n", s.Attributes.CharacterLimit)
-	fmt.Printf("    Pluralized: %v\n", s.Attributes.Pluralized)
-	fmt.Printf("    StringHash: %v\n", s.Attributes.StringHash)
-	fmt.Printf("    DatetimeCreated: %v\n", s.Attributes.DatetimeCreated)
-	fmt.Printf("    MetadataDatetimeModified: %v\n", s.Attributes.MetadataDatetimeModified)
-	fmt.Printf("    StringsDatetimeModified: %v\n", s.Attributes.StringsDatetimeModified)
-
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Resource:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", s.Relationships.Resource.Data.Type)
-	fmt.Printf("        ID: %v\n", s.Relationships.Resource.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", s.Relationships.Resource.Links.Related)
-	fmt.Printf("    Language:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", s.Relationships.Language.Data.Type)
-	fmt.Printf("        ID: %v\n", s.Relationships.Language.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", s.Relationships.Language.Links.Related)
-	fmt.Printf("    Committer:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", s.Relationships.Committer.Data.Type)
-	fmt.Printf("        ID: %v\n", s.Relationships.Committer.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", s.Relationships.Committer.Links.Related)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", s.Links.Self)
 }

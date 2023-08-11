@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -142,31 +143,43 @@ func (t *TransifexApiClient) GetSingleTeamMembership(team_membership_id string) 
 }
 
 // The function prints the information about an team membership
-func (t *TransifexApiClient) PrintTeamMembership(tm TeamMembership) {
+func (t *TransifexApiClient) PrintTeamMembership(tm TeamMembership, formatter string) {
 
-	fmt.Printf("Team membership information:\n")
-	fmt.Printf("  Type: %v\n", tm.Type)
-	fmt.Printf("  ID: %v\n", tm.ID)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Role: %v\n", tm.Attributes.Role)
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Team:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", tm.Relationships.Team.Data.Type)
-	fmt.Printf("        ID: %v\n", tm.Relationships.Team.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", tm.Relationships.Team.Links.Related)
-	fmt.Printf("    Language:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", tm.Relationships.Language.Data.Type)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", tm.Relationships.Language.Links.Related)
-	fmt.Printf("    User:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", tm.Relationships.User.Data.Type)
-	fmt.Printf("        ID: %v\n", tm.Relationships.User.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", tm.Relationships.User.Links.Related)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", tm.Links.Self)
+	switch formatter {
+	case "text":
+		fmt.Printf("Team membership information:\n")
+		fmt.Printf("  Type: %v\n", tm.Type)
+		fmt.Printf("  ID: %v\n", tm.ID)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    Role: %v\n", tm.Attributes.Role)
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Team:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", tm.Relationships.Team.Data.Type)
+		fmt.Printf("        ID: %v\n", tm.Relationships.Team.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", tm.Relationships.Team.Links.Related)
+		fmt.Printf("    Language:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", tm.Relationships.Language.Data.Type)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", tm.Relationships.Language.Links.Related)
+		fmt.Printf("    User:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", tm.Relationships.User.Data.Type)
+		fmt.Printf("        ID: %v\n", tm.Relationships.User.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", tm.Relationships.User.Links.Related)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", tm.Links.Self)
+
+	case "json":
+		text2print, err := json.Marshal(tm)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
+	}
 }

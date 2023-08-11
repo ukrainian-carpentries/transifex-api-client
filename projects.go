@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -369,70 +370,80 @@ func (t *TransifexApiClient) GetTeamRelationship(projectID string) (TeamRelation
 }
 
 // The function prints the information about a project
-func (t *TransifexApiClient) PrintProject(p Project) {
+func (t *TransifexApiClient) PrintProject(p Project, formatter string) {
 
-	fmt.Printf("Project information:\n")
-	fmt.Printf("  ID: %v\n", p.ID)
-	fmt.Printf("  Type: %v\n", p.Type)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Slug: %v\n", p.Attributes.Slug)
-	fmt.Printf("    Name: %v\n", p.Attributes.Name)
-	fmt.Printf("    Type: %v\n", p.Attributes.Type)
-	fmt.Printf("    DatetimeCreated: %v\n", p.Attributes.DatetimeCreated)
-	fmt.Printf("    DatetimeModified: %v\n", p.Attributes.DatetimeModified)
+	switch formatter {
+	case "text":
+		fmt.Printf("  ID: %v\n", p.ID)
+		fmt.Printf("  Type: %v\n", p.Type)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    Slug: %v\n", p.Attributes.Slug)
+		fmt.Printf("    Name: %v\n", p.Attributes.Name)
+		fmt.Printf("    Type: %v\n", p.Attributes.Type)
+		fmt.Printf("    DatetimeCreated: %v\n", p.Attributes.DatetimeCreated)
+		fmt.Printf("    DatetimeModified: %v\n", p.Attributes.DatetimeModified)
 
-	// !ToDo: Check the Tags type
-	if len(p.Attributes.Tags) > 0 {
-		fmt.Printf("    Tags:\n")
-		for _, v := range p.Attributes.Tags {
-			fmt.Printf("      - %v\n", v)
+		// !ToDo: Check the Tags type
+		if len(p.Attributes.Tags) > 0 {
+			fmt.Printf("    Tags:\n")
+			for _, v := range p.Attributes.Tags {
+				fmt.Printf("      - %v\n", v)
+			}
 		}
+
+		fmt.Printf("    Description: %v\n", p.Attributes.Description)
+		fmt.Printf("    LongDescription: %v\n", p.Attributes.LongDescription)
+		fmt.Printf("    Private: %v\n", p.Attributes.Private)
+		fmt.Printf("    Archived: %v\n", p.Attributes.Archived)
+		fmt.Printf("    TranslationMemoryFillup: %v\n", p.Attributes.TranslationMemoryFillup)
+		fmt.Printf("    MachineTranslationFillup: %v\n", p.Attributes.MachineTranslationFillup)
+		fmt.Printf("    HomepageURL: %v\n", p.Attributes.HomepageURL)
+		fmt.Printf("    RepositoryURL: %v\n", p.Attributes.RepositoryURL)
+		fmt.Printf("    InstructionsURL: %v\n", p.Attributes.InstructionsURL)
+		fmt.Printf("    License: %v\n", p.Attributes.License)
+		fmt.Printf("    LogoURL: %v\n", p.Attributes.LogoURL)
+
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Organization:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", p.Relationships.Organization.Links.Related)
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", p.Relationships.Organization.Data.Type)
+		fmt.Printf("        ID: %v\n", p.Relationships.Organization.Data.ID)
+
+		fmt.Printf("    SourceLanguage:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", p.Relationships.SourceLanguage.Links.Related)
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", p.Relationships.SourceLanguage.Data.Type)
+		fmt.Printf("        ID: %v\n", p.Relationships.SourceLanguage.Data.ID)
+		fmt.Printf("    Languages:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Self: %v\n", p.Relationships.Languages.Links.Self)
+		fmt.Printf("        Related: %v\n", p.Relationships.Languages.Links.Related)
+		fmt.Printf("    Team:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", p.Relationships.Team.Data.Type)
+		fmt.Printf("        ID: %v\n", p.Relationships.Team.Data.ID)
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", p.Relationships.Team.Links.Related)
+		fmt.Printf("        Self: %v\n", p.Relationships.Team.Links.Self)
+		fmt.Printf("    Maintainers:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", p.Relationships.Maintainers.Links.Related)
+		fmt.Printf("        Self: %v\n", p.Relationships.Maintainers.Links.Self)
+		fmt.Printf("    Resources:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", p.Relationships.Resources.Links.Related)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", p.Links.Self)
+	case "json":
+		text2print, err := json.Marshal(p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
 	}
-
-	fmt.Printf("    Description: %v\n", p.Attributes.Description)
-	fmt.Printf("    LongDescription: %v\n", p.Attributes.LongDescription)
-	fmt.Printf("    Private: %v\n", p.Attributes.Private)
-	fmt.Printf("    Archived: %v\n", p.Attributes.Archived)
-	fmt.Printf("    TranslationMemoryFillup: %v\n", p.Attributes.TranslationMemoryFillup)
-	fmt.Printf("    MachineTranslationFillup: %v\n", p.Attributes.MachineTranslationFillup)
-	fmt.Printf("    HomepageURL: %v\n", p.Attributes.HomepageURL)
-	fmt.Printf("    RepositoryURL: %v\n", p.Attributes.RepositoryURL)
-	fmt.Printf("    InstructionsURL: %v\n", p.Attributes.InstructionsURL)
-	fmt.Printf("    License: %v\n", p.Attributes.License)
-	fmt.Printf("    LogoURL: %v\n", p.Attributes.LogoURL)
-
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Organization:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", p.Relationships.Organization.Links.Related)
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", p.Relationships.Organization.Data.Type)
-	fmt.Printf("        ID: %v\n", p.Relationships.Organization.Data.ID)
-
-	fmt.Printf("    SourceLanguage:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", p.Relationships.SourceLanguage.Links.Related)
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", p.Relationships.SourceLanguage.Data.Type)
-	fmt.Printf("        ID: %v\n", p.Relationships.SourceLanguage.Data.ID)
-	fmt.Printf("    Languages:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Self: %v\n", p.Relationships.Languages.Links.Self)
-	fmt.Printf("        Related: %v\n", p.Relationships.Languages.Links.Related)
-	fmt.Printf("    Team:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", p.Relationships.Team.Data.Type)
-	fmt.Printf("        ID: %v\n", p.Relationships.Team.Data.ID)
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", p.Relationships.Team.Links.Related)
-	fmt.Printf("        Self: %v\n", p.Relationships.Team.Links.Self)
-	fmt.Printf("    Maintainers:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", p.Relationships.Maintainers.Links.Related)
-	fmt.Printf("        Self: %v\n", p.Relationships.Maintainers.Links.Self)
-	fmt.Printf("    Resources:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", p.Relationships.Resources.Links.Related)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", p.Links.Self)
 }

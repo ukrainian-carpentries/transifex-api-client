@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -276,30 +277,41 @@ func (t *TransifexApiClient) GetTeamManagerRelationships(teamID string) ([]TeamM
 }
 
 // The function prints the information about an organization
-func (t *TransifexApiClient) PrintTeam(tt Team) {
+func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 
-	fmt.Printf("Team information:\n")
-	fmt.Printf("  Type: %v\n", tt.Type)
-	fmt.Printf("  ID: %v\n", tt.ID)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Name: %v\n", tt.Attributes.Name)
-	fmt.Printf("    Slug: %v\n", tt.Attributes.Slug)
-	fmt.Printf("    AutoJoin: %v\n", tt.Attributes.AutoJoin)
-	fmt.Printf("    ClaRequired: %v\n", tt.Attributes.ClaRequired)
-	fmt.Printf("    Cla: %v\n", tt.Attributes.Cla)
-	fmt.Printf("    DatetimeCreated: %v\n", tt.Attributes.DatetimeCreated)
+	switch formatter {
+	case "text":
+		fmt.Printf("Team information:\n")
+		fmt.Printf("  Type: %v\n", tt.Type)
+		fmt.Printf("  ID: %v\n", tt.ID)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    Name: %v\n", tt.Attributes.Name)
+		fmt.Printf("    Slug: %v\n", tt.Attributes.Slug)
+		fmt.Printf("    AutoJoin: %v\n", tt.Attributes.AutoJoin)
+		fmt.Printf("    ClaRequired: %v\n", tt.Attributes.ClaRequired)
+		fmt.Printf("    Cla: %v\n", tt.Attributes.Cla)
+		fmt.Printf("    DatetimeCreated: %v\n", tt.Attributes.DatetimeCreated)
 
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Organization:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", tt.Relationships.Organization.Links.Related)
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", tt.Relationships.Organization.Data.Type)
-	fmt.Printf("        ID: %v\n", tt.Relationships.Organization.Data.ID)
-	fmt.Printf("    Managers:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", tt.Relationships.Managers.Links.Related)
-	fmt.Printf("        Self: %v\n", tt.Relationships.Managers.Links.Self)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", tt.Links.Self)
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Organization:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", tt.Relationships.Organization.Links.Related)
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", tt.Relationships.Organization.Data.Type)
+		fmt.Printf("        ID: %v\n", tt.Relationships.Organization.Data.ID)
+		fmt.Printf("    Managers:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", tt.Relationships.Managers.Links.Related)
+		fmt.Printf("        Self: %v\n", tt.Relationships.Managers.Links.Self)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", tt.Links.Self)
+	case "json":
+		text2print, err := json.Marshal(tt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
+	}
 }

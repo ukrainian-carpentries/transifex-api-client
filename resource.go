@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -148,48 +149,59 @@ func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, er
 }
 
 // The function prints the information about an resource
-func (t *TransifexApiClient) PrintResource(r Resource) {
+func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 
-	fmt.Printf("Resource information:\n")
-	fmt.Printf("  ID: %v\n", r.ID)
-	fmt.Printf("  Type: %v\n", r.Type)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Slug: %v\n", r.Attributes.Slug)
-	fmt.Printf("    Name: %v\n", r.Attributes.Name)
-	fmt.Printf("    Priority: %v\n", r.Attributes.Priority)
-	fmt.Printf("    I18NType: %v\n", r.Attributes.I18NType)
-	fmt.Printf("    I18NVersion: %v\n", r.Attributes.I18NVersion)
-	fmt.Printf("    AcceptTranslations: %v\n", r.Attributes.AcceptTranslations)
-	fmt.Printf("    StringCount: %v\n", r.Attributes.StringCount)
-	fmt.Printf("    WordCount: %v\n", r.Attributes.WordCount)
-	fmt.Printf("    DatetimeCreated: %v\n", r.Attributes.DatetimeCreated)
-	fmt.Printf("    DatetimeModified: %v\n", r.Attributes.DatetimeModified)
+	switch formatter {
+	case "text":
 
-	if len(r.Attributes.Categories) > 0 {
-		for _, v := range r.Attributes.Categories {
-			fmt.Printf("%v\n", v)
+		fmt.Printf("  ID: %v\n", r.ID)
+		fmt.Printf("  Type: %v\n", r.Type)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    Slug: %v\n", r.Attributes.Slug)
+		fmt.Printf("    Name: %v\n", r.Attributes.Name)
+		fmt.Printf("    Priority: %v\n", r.Attributes.Priority)
+		fmt.Printf("    I18NType: %v\n", r.Attributes.I18NType)
+		fmt.Printf("    I18NVersion: %v\n", r.Attributes.I18NVersion)
+		fmt.Printf("    AcceptTranslations: %v\n", r.Attributes.AcceptTranslations)
+		fmt.Printf("    StringCount: %v\n", r.Attributes.StringCount)
+		fmt.Printf("    WordCount: %v\n", r.Attributes.WordCount)
+		fmt.Printf("    DatetimeCreated: %v\n", r.Attributes.DatetimeCreated)
+		fmt.Printf("    DatetimeModified: %v\n", r.Attributes.DatetimeModified)
+
+		if len(r.Attributes.Categories) > 0 {
+			for _, v := range r.Attributes.Categories {
+				fmt.Printf("%v\n", v)
+			}
 		}
+
+		fmt.Printf("    I18NOptions: %v\n", r.Attributes.I18NOptions)
+		fmt.Printf("    Mp4URL: %v\n", r.Attributes.Mp4URL)
+		fmt.Printf("    OggURL: %v\n", r.Attributes.OggURL)
+		fmt.Printf("    YoutubeURL: %v\n", r.Attributes.YoutubeURL)
+		fmt.Printf("    WebmURL: %v\n", r.Attributes.WebmURL)
+
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Project:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", r.Relationships.Project.Links.Related)
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", r.Relationships.Project.Data.Type)
+		fmt.Printf("        ID: %v\n", r.Relationships.Project.Data.ID)
+
+		fmt.Printf("    I18NFormat:\n")
+		fmt.Printf("      Data:\n")
+		fmt.Printf("        Type: %v\n", r.Relationships.I18NFormat.Data.Type)
+		fmt.Printf("        ID: %v\n", r.Relationships.I18NFormat.Data.ID)
+		fmt.Printf("    Base: %v\n", r.Relationships.Base)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", r.Links.Self)
+	case "json":
+		text2print, err := json.Marshal(r)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
 	}
-
-	fmt.Printf("    I18NOptions: %v\n", r.Attributes.I18NOptions)
-	fmt.Printf("    Mp4URL: %v\n", r.Attributes.Mp4URL)
-	fmt.Printf("    OggURL: %v\n", r.Attributes.OggURL)
-	fmt.Printf("    YoutubeURL: %v\n", r.Attributes.YoutubeURL)
-	fmt.Printf("    WebmURL: %v\n", r.Attributes.WebmURL)
-
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Project:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", r.Relationships.Project.Links.Related)
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", r.Relationships.Project.Data.Type)
-	fmt.Printf("        ID: %v\n", r.Relationships.Project.Data.ID)
-
-	fmt.Printf("    I18NFormat:\n")
-	fmt.Printf("      Data:\n")
-	fmt.Printf("        Type: %v\n", r.Relationships.I18NFormat.Data.Type)
-	fmt.Printf("        ID: %v\n", r.Relationships.I18NFormat.Data.ID)
-	fmt.Printf("    Base: %v\n", r.Relationships.Base)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", r.Links.Self)
 }

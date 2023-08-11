@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -128,23 +129,33 @@ func (t *TransifexApiClient) GetOrganizationDetails(id string) (Organization, er
 }
 
 // The function prints the information about an organization
-func (t *TransifexApiClient) PrintOrganization(o Organization) {
+func (t *TransifexApiClient) PrintOrganization(o Organization, formatter string) {
 
-	fmt.Printf("Organization information:\n")
-	fmt.Printf("  ID: %v\n", o.ID)
-	fmt.Printf("  Type: %v\n", o.Type)
-	fmt.Printf("  Attributes:\n")
-	fmt.Printf("    Name: %v\n", o.Attributes.Name)
-	fmt.Printf("    Slug: %v\n", o.Attributes.Slug)
-	fmt.Printf("    LogoURL: %v\n", o.Attributes.LogoURL)
-	fmt.Printf("    Private: %v\n", o.Attributes.Private)
-	fmt.Printf("  Links:\n")
-	fmt.Printf("    Self: %v\n", o.Links.Self)
-	fmt.Printf("  Relationships:\n")
-	fmt.Printf("    Projects:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", o.Relationships.Projects.Links.Related)
-	fmt.Printf("    Teams:\n")
-	fmt.Printf("      Links:\n")
-	fmt.Printf("        Related: %v\n", o.Relationships.Teams.Links.Related)
+	switch formatter {
+	case "text":
+		fmt.Printf("  ID: %v\n", o.ID)
+		fmt.Printf("  Type: %v\n", o.Type)
+		fmt.Printf("  Attributes:\n")
+		fmt.Printf("    Name: %v\n", o.Attributes.Name)
+		fmt.Printf("    Slug: %v\n", o.Attributes.Slug)
+		fmt.Printf("    LogoURL: %v\n", o.Attributes.LogoURL)
+		fmt.Printf("    Private: %v\n", o.Attributes.Private)
+		fmt.Printf("  Links:\n")
+		fmt.Printf("    Self: %v\n", o.Links.Self)
+		fmt.Printf("  Relationships:\n")
+		fmt.Printf("    Projects:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", o.Relationships.Projects.Links.Related)
+		fmt.Printf("    Teams:\n")
+		fmt.Printf("      Links:\n")
+		fmt.Printf("        Related: %v\n", o.Relationships.Teams.Links.Related)
+	case "json":
+		text2print, err := json.Marshal(o)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(text2print))
+
+	default:
+	}
 }
