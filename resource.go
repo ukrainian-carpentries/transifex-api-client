@@ -148,7 +148,7 @@ func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, er
 	return r.Data, nil
 }
 
-// The function prints the information about an resource
+// The function prints the information about a resource
 func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 
 	switch formatter {
