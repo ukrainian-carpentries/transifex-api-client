@@ -91,9 +91,9 @@ func (t *TransifexApiClient) ListTeams(organizationID string) ([]Team, error) {
 	var ts struct {
 		Data  []Team `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 
@@ -184,9 +184,9 @@ func (t *TransifexApiClient) GetTeamManagers(teamID string) ([]TeamManager, erro
 	var tms struct {
 		Data  []TeamManager `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 
@@ -234,9 +234,9 @@ func (t *TransifexApiClient) GetTeamManagerRelationships(teamID string) ([]TeamM
 	var tmrs struct {
 		Data  []TeamManagerRelationship `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 

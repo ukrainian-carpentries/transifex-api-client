@@ -7,48 +7,46 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type Resource struct {
 	ID         string `json:"id"`
 	Type       string `json:"type"`
 	Attributes struct {
-		Slug               string        `json:"slug"`
-		Name               string        `json:"name"`
-		Priority           string        `json:"priority"`
-		I18NType           string        `json:"i18n_type"`
-		I18NVersion        int           `json:"i18n_version"`
-		AcceptTranslations bool          `json:"accept_translations"`
-		StringCount        int           `json:"string_count"`
-		WordCount          int           `json:"word_count"`
-		DatetimeCreated    time.Time     `json:"datetime_created"`
-		DatetimeModified   time.Time     `json:"datetime_modified"`
-		Categories         []interface{} `json:"categories"`
+		AcceptTranslations bool     `json:"accept_translations"`
+		Categories         []string `json:"categories"`
+		DatetimeCreated    string   `json:"datetime_created"`
+		DatetimeModified   string   `json:"datetime_modified"`
 		I18NOptions        struct {
+			AllowDuplicateStrings bool `json:"allow_duplicate_strings"`
 		} `json:"i18n_options"`
-		Mp4URL     interface{} `json:"mp4_url"`
-		OggURL     interface{} `json:"ogg_url"`
-		YoutubeURL interface{} `json:"youtube_url"`
-		WebmURL    interface{} `json:"webm_url"`
+		I18NVersion int    `json:"i18n_version"`
+		Mp4URL      string `json:"mp4_url"`
+		Name        string `json:"name"`
+		OggURL      string `json:"ogg_url"`
+		Priority    string `json:"priority"`
+		Slug        string `json:"slug"`
+		StringCount int    `json:"string_count"`
+		WebmURL     string `json:"webm_url"`
+		WordCount   int    `json:"word_count"`
+		YoutubeURL  string `json:"youtube_url"`
 	} `json:"attributes"`
 	Relationships struct {
+		I18NFormat struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
+		} `json:"i18n_format"`
 		Project struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
 			Links struct {
 				Related string `json:"related"`
 			} `json:"links"`
-			Data struct {
-				Type string `json:"type"`
-				ID   string `json:"id"`
-			} `json:"data"`
 		} `json:"project"`
-		I18NFormat struct {
-			Data struct {
-				Type string `json:"type"`
-				ID   string `json:"id"`
-			} `json:"data"`
-		} `json:"i18n_format"`
-		Base interface{} `json:"base"`
 	} `json:"relationships"`
 	Links struct {
 		Self string `json:"self"`
@@ -63,9 +61,9 @@ func (t *TransifexApiClient) ListResources(projectID string) ([]Resource, error)
 	var r struct {
 		Data  []Resource `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 
@@ -160,7 +158,6 @@ func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 		fmt.Printf("    Slug: %v\n", r.Attributes.Slug)
 		fmt.Printf("    Name: %v\n", r.Attributes.Name)
 		fmt.Printf("    Priority: %v\n", r.Attributes.Priority)
-		fmt.Printf("    I18NType: %v\n", r.Attributes.I18NType)
 		fmt.Printf("    I18NVersion: %v\n", r.Attributes.I18NVersion)
 		fmt.Printf("    AcceptTranslations: %v\n", r.Attributes.AcceptTranslations)
 		fmt.Printf("    StringCount: %v\n", r.Attributes.StringCount)
@@ -192,7 +189,6 @@ func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 		fmt.Printf("      Data:\n")
 		fmt.Printf("        Type: %v\n", r.Relationships.I18NFormat.Data.Type)
 		fmt.Printf("        ID: %v\n", r.Relationships.I18NFormat.Data.ID)
-		fmt.Printf("    Base: %v\n", r.Relationships.Base)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", r.Links.Self)
 	case "json":

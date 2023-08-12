@@ -43,9 +43,9 @@ func (t *TransifexApiClient) ListOrganizations() ([]Organization, error) {
 	var lor struct {
 		Data  []Organization `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
+			Self     string `json:"self"`
 		} `json:"links"`
 	}
 

@@ -57,9 +57,9 @@ func (t *TransifexApiClient) ListTeamMemberships(organizationID string) ([]TeamM
 	var tms struct {
 		Data  []TeamMembership `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     string      `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 

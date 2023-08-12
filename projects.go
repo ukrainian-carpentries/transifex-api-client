@@ -7,81 +7,80 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type Project struct {
-	ID         string `json:"id"`
-	Type       string `json:"type"`
 	Attributes struct {
-		Slug                     string        `json:"slug"`
-		Name                     string        `json:"name"`
-		Type                     string        `json:"type"`
-		DatetimeCreated          time.Time     `json:"datetime_created"`
-		DatetimeModified         time.Time     `json:"datetime_modified"`
-		Tags                     []interface{} `json:"tags"`
-		Description              string        `json:"description"`
-		LongDescription          string        `json:"long_description"`
-		Private                  bool          `json:"private"`
-		Archived                 bool          `json:"archived"`
-		TranslationMemoryFillup  bool          `json:"translation_memory_fillup"`
-		MachineTranslationFillup bool          `json:"machine_translation_fillup"`
-		HomepageURL              string        `json:"homepage_url"`
-		RepositoryURL            string        `json:"repository_url"`
-		InstructionsURL          string        `json:"instructions_url"`
-		License                  string        `json:"license"`
-		LogoURL                  string        `json:"logo_url"`
+		Archived                 bool     `json:"archived"`
+		DatetimeCreated          string   `json:"datetime_created"`
+		DatetimeModified         string   `json:"datetime_modified"`
+		Description              string   `json:"description"`
+		HomepageURL              string   `json:"homepage_url"`
+		InstructionsURL          string   `json:"instructions_url"`
+		License                  string   `json:"license"`
+		LogoURL                  string   `json:"logo_url"`
+		LongDescription          string   `json:"long_description"`
+		MachineTranslationFillup bool     `json:"machine_translation_fillup"`
+		Name                     string   `json:"name"`
+		Private                  bool     `json:"private"`
+		RepositoryURL            string   `json:"repository_url"`
+		Slug                     string   `json:"slug"`
+		Tags                     []string `json:"tags"`
+		TranslationMemoryFillup  bool     `json:"translation_memory_fillup"`
+		Type                     string   `json:"type"`
 	} `json:"attributes"`
+	ID    string `json:"id"`
+	Links struct {
+		Self string `json:"self"`
+	} `json:"links"`
 	Relationships struct {
-		Organization struct {
-			Links struct {
-				Related string `json:"related"`
-			} `json:"links"`
-			Data struct {
-				Type string `json:"type"`
-				ID   string `json:"id"`
-			} `json:"data"`
-		} `json:"organization"`
-		SourceLanguage struct {
-			Links struct {
-				Related string `json:"related"`
-			} `json:"links"`
-			Data struct {
-				Type string `json:"type"`
-				ID   string `json:"id"`
-			} `json:"data"`
-		} `json:"source_language"`
 		Languages struct {
 			Links struct {
-				Self    string `json:"self"`
 				Related string `json:"related"`
+				Self    string `json:"self"`
 			} `json:"links"`
 		} `json:"languages"`
-		Team struct {
-			Data struct {
-				Type string `json:"type"`
-				ID   string `json:"id"`
-			} `json:"data"`
-			Links struct {
-				Related string `json:"related"`
-				Self    string `json:"self"`
-			} `json:"links"`
-		} `json:"team"`
 		Maintainers struct {
 			Links struct {
 				Related string `json:"related"`
 				Self    string `json:"self"`
 			} `json:"links"`
 		} `json:"maintainers"`
+		Organization struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
+			Links struct {
+				Related string `json:"related"`
+			} `json:"links"`
+		} `json:"organization"`
 		Resources struct {
 			Links struct {
 				Related string `json:"related"`
 			} `json:"links"`
 		} `json:"resources"`
+		SourceLanguage struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
+			Links struct {
+				Related string `json:"related"`
+			} `json:"links"`
+		} `json:"source_language"`
+		Team struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
+			Links struct {
+				Related string `json:"related"`
+				Self    string `json:"self"`
+			} `json:"links"`
+		} `json:"team"`
 	} `json:"relationships"`
-	Links struct {
-		Self string `json:"self"`
-	} `json:"links"`
+	Type string `json:"type"`
 }
 
 // Get the list of projects that belong to a single organization.
@@ -92,9 +91,9 @@ func (t *TransifexApiClient) ListProjects(organizationID string) ([]Project, err
 	var lpr struct {
 		Data  []Project `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
+			Self     string `json:"self"`
 		} `json:"links"`
 	}
 
@@ -278,9 +277,9 @@ func (t *TransifexApiClient) GetProjectMaintainerRelationships(projectID string)
 	var pmr struct {
 		Data  []MaintainerRelationship `json:"data"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 

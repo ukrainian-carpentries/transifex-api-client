@@ -17,14 +17,14 @@ type ResourceTranslation struct {
 		Strings struct {
 			Other string `json:"other"`
 		} `json:"strings"`
-		Reviewed           bool        `json:"reviewed"`
-		Proofread          bool        `json:"proofread"`
-		Finalized          bool        `json:"finalized"`
-		Origin             string      `json:"origin"`
-		DatetimeCreated    time.Time   `json:"datetime_created"`
-		DatetimeTranslated time.Time   `json:"datetime_translated"`
-		DatetimeReviewed   time.Time   `json:"datetime_reviewed"`
-		DatetimeProofread  interface{} `json:"datetime_proofread"`
+		Reviewed           bool      `json:"reviewed"`
+		Proofread          bool      `json:"proofread"`
+		Finalized          bool      `json:"finalized"`
+		Origin             string    `json:"origin"`
+		DatetimeCreated    time.Time `json:"datetime_created"`
+		DatetimeTranslated time.Time `json:"datetime_translated"`
+		DatetimeReviewed   time.Time `json:"datetime_reviewed"`
+		DatetimeProofread  time.Time `json:"datetime_proofread"`
 	} `json:"attributes"`
 	Relationships struct {
 		Resource struct {
@@ -63,7 +63,15 @@ type ResourceTranslation struct {
 				Related string `json:"related"`
 			} `json:"links"`
 		} `json:"reviewer"`
-		Proofreader    interface{} `json:"proofreader"`
+		Proofreader struct {
+			Data struct {
+				ID   string `json:"id"`
+				Type string `json:"type"`
+			} `json:"data"`
+			Links struct {
+				Related string `json:"related"`
+			} `json:"links"`
+		} `json:"proofreader"`
 		ResourceString struct {
 			Data struct {
 				Type string `json:"type"`
@@ -85,11 +93,66 @@ func (t *TransifexApiClient) GetResourceTranslationsCollection(resourceID, langu
 
 	// Define the variable to decode the service response
 	var rtc struct {
-		Data  []ResourceTranslation `json:"data"`
+		Data     []ResourceTranslation `json:"data"`
+		Included []struct {
+			Attributes struct {
+				AppearanceOrder          int    `json:"appearance_order"`
+				CharacterLimit           int    `json:"character_limit"`
+				Context                  string `json:"context"`
+				DatetimeCreated          string `json:"datetime_created"`
+				DeveloperComment         string `json:"developer_comment"`
+				Instructions             string `json:"instructions"`
+				Key                      string `json:"key"`
+				MetadataDatetimeModified string `json:"metadata_datetime_modified"`
+				Occurrences              string `json:"occurrences"`
+				Pluralized               bool   `json:"pluralized"`
+				StringHash               string `json:"string_hash"`
+				Strings                  struct {
+					One   string `json:"one"`
+					Other string `json:"other"`
+				} `json:"strings"`
+				StringsDatetimeModified string   `json:"strings_datetime_modified"`
+				Tags                    []string `json:"tags"`
+			} `json:"attributes"`
+			ID    string `json:"id"`
+			Links struct {
+				Self string `json:"self"`
+			} `json:"links"`
+			Relationships struct {
+				Committer struct {
+					Data struct {
+						ID   string `json:"id"`
+						Type string `json:"type"`
+					} `json:"data"`
+					Links struct {
+						Related string `json:"related"`
+					} `json:"links"`
+				} `json:"committer"`
+				Language struct {
+					Data struct {
+						ID   string `json:"id"`
+						Type string `json:"type"`
+					} `json:"data"`
+					Links struct {
+						Related string `json:"related"`
+					} `json:"links"`
+				} `json:"language"`
+				Resource struct {
+					Data struct {
+						ID   string `json:"id"`
+						Type string `json:"type"`
+					} `json:"data"`
+					Links struct {
+						Related string `json:"related"`
+					} `json:"links"`
+				} `json:"resource"`
+			} `json:"relationships"`
+			Type string `json:"type"`
+		} `json:"included"`
 		Links struct {
-			Self     string      `json:"self"`
-			Next     interface{} `json:"next"`
-			Previous interface{} `json:"previous"`
+			Self     string `json:"self"`
+			Next     string `json:"next"`
+			Previous string `json:"previous"`
 		} `json:"links"`
 	}
 
