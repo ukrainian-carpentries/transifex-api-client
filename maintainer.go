@@ -26,6 +26,7 @@ type MaintainerRelationship struct {
 func (t *TransifexApiClient) PrintMaintainer(m Maintainer, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("Maintainer information:\n")
 		fmt.Printf("  ID: %v\n", m.ID)
@@ -34,6 +35,7 @@ func (t *TransifexApiClient) PrintMaintainer(m Maintainer, formatter string) {
 		fmt.Printf("    Username: %v\n", m.Attributes.Username)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", m.Links.Self)
+
 	case "json":
 		text2print, err := json.Marshal(m)
 		if err != nil {

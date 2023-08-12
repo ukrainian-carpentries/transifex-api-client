@@ -280,6 +280,7 @@ func (t *TransifexApiClient) GetTeamManagerRelationships(teamID string) ([]TeamM
 func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("Team information:\n")
 		fmt.Printf("  Type: %v\n", tt.Type)
@@ -291,7 +292,6 @@ func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 		fmt.Printf("    ClaRequired: %v\n", tt.Attributes.ClaRequired)
 		fmt.Printf("    Cla: %v\n", tt.Attributes.Cla)
 		fmt.Printf("    DatetimeCreated: %v\n", tt.Attributes.DatetimeCreated)
-
 		fmt.Printf("  Relationships:\n")
 		fmt.Printf("    Organization:\n")
 		fmt.Printf("      Links:\n")
@@ -305,6 +305,7 @@ func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 		fmt.Printf("        Self: %v\n", tt.Relationships.Managers.Links.Self)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", tt.Links.Self)
+		
 	case "json":
 		text2print, err := json.Marshal(tt)
 		if err != nil {

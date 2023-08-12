@@ -132,6 +132,7 @@ func (t *TransifexApiClient) GetOrganizationDetails(id string) (Organization, er
 func (t *TransifexApiClient) PrintOrganization(o Organization, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("  ID: %v\n", o.ID)
 		fmt.Printf("  Type: %v\n", o.Type)
@@ -149,6 +150,7 @@ func (t *TransifexApiClient) PrintOrganization(o Organization, formatter string)
 		fmt.Printf("    Teams:\n")
 		fmt.Printf("      Links:\n")
 		fmt.Printf("        Related: %v\n", o.Relationships.Teams.Links.Related)
+
 	case "json":
 		text2print, err := json.Marshal(o)
 		if err != nil {

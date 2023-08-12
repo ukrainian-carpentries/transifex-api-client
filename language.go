@@ -33,6 +33,7 @@ type LanguageRelationship struct {
 func (t *TransifexApiClient) PrintLanguage(l Language, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("Language information:\n")
 		fmt.Printf("  ID: %+v\n", l.ID)
@@ -47,6 +48,7 @@ func (t *TransifexApiClient) PrintLanguage(l Language, formatter string) {
 		fmt.Printf("      Other: %+v\n", l.Attributes.PluralRules.Other)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %+v\n", l.Links.Self)
+
 	case "json":
 		text2print, err := json.Marshal(l)
 		if err != nil {

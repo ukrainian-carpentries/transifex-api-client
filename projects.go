@@ -372,6 +372,7 @@ func (t *TransifexApiClient) GetTeamRelationship(projectID string) (TeamRelation
 func (t *TransifexApiClient) PrintProject(p Project, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("  ID: %v\n", p.ID)
 		fmt.Printf("  Type: %v\n", p.Type)
@@ -381,15 +382,12 @@ func (t *TransifexApiClient) PrintProject(p Project, formatter string) {
 		fmt.Printf("    Type: %v\n", p.Attributes.Type)
 		fmt.Printf("    DatetimeCreated: %v\n", p.Attributes.DatetimeCreated)
 		fmt.Printf("    DatetimeModified: %v\n", p.Attributes.DatetimeModified)
-
-		// !ToDo: Check the Tags type
 		if len(p.Attributes.Tags) > 0 {
 			fmt.Printf("    Tags:\n")
 			for _, v := range p.Attributes.Tags {
 				fmt.Printf("      - %v\n", v)
 			}
 		}
-
 		fmt.Printf("    Description: %v\n", p.Attributes.Description)
 		fmt.Printf("    LongDescription: %v\n", p.Attributes.LongDescription)
 		fmt.Printf("    Private: %v\n", p.Attributes.Private)
@@ -436,6 +434,7 @@ func (t *TransifexApiClient) PrintProject(p Project, formatter string) {
 		fmt.Printf("        Related: %v\n", p.Relationships.Resources.Links.Related)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", p.Links.Self)
+
 	case "json":
 		text2print, err := json.Marshal(p)
 		if err != nil {

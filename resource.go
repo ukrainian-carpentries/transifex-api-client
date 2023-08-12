@@ -150,8 +150,8 @@ func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, er
 func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 
 	switch formatter {
-	case "text":
 
+	case "text":
 		fmt.Printf("  ID: %v\n", r.ID)
 		fmt.Printf("  Type: %v\n", r.Type)
 		fmt.Printf("  Attributes:\n")
@@ -164,19 +164,16 @@ func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 		fmt.Printf("    WordCount: %v\n", r.Attributes.WordCount)
 		fmt.Printf("    DatetimeCreated: %v\n", r.Attributes.DatetimeCreated)
 		fmt.Printf("    DatetimeModified: %v\n", r.Attributes.DatetimeModified)
-
 		if len(r.Attributes.Categories) > 0 {
 			for _, v := range r.Attributes.Categories {
 				fmt.Printf("%v\n", v)
 			}
 		}
-
 		fmt.Printf("    I18NOptions: %v\n", r.Attributes.I18NOptions)
 		fmt.Printf("    Mp4URL: %v\n", r.Attributes.Mp4URL)
 		fmt.Printf("    OggURL: %v\n", r.Attributes.OggURL)
 		fmt.Printf("    YoutubeURL: %v\n", r.Attributes.YoutubeURL)
 		fmt.Printf("    WebmURL: %v\n", r.Attributes.WebmURL)
-
 		fmt.Printf("  Relationships:\n")
 		fmt.Printf("    Project:\n")
 		fmt.Printf("      Links:\n")
@@ -184,13 +181,13 @@ func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 		fmt.Printf("      Data:\n")
 		fmt.Printf("        Type: %v\n", r.Relationships.Project.Data.Type)
 		fmt.Printf("        ID: %v\n", r.Relationships.Project.Data.ID)
-
 		fmt.Printf("    I18NFormat:\n")
 		fmt.Printf("      Data:\n")
 		fmt.Printf("        Type: %v\n", r.Relationships.I18NFormat.Data.Type)
 		fmt.Printf("        ID: %v\n", r.Relationships.I18NFormat.Data.ID)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", r.Links.Self)
+
 	case "json":
 		text2print, err := json.Marshal(r)
 		if err != nil {

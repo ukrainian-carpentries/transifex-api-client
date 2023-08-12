@@ -146,6 +146,7 @@ func (t *TransifexApiClient) GetSingleTeamMembership(team_membership_id string) 
 func (t *TransifexApiClient) PrintTeamMembership(tm TeamMembership, formatter string) {
 
 	switch formatter {
+		
 	case "text":
 		fmt.Printf("Team membership information:\n")
 		fmt.Printf("  Type: %v\n", tm.Type)

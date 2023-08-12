@@ -212,6 +212,7 @@ func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resourceStringID stri
 func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter string) {
 
 	switch formatter {
+
 	case "text":
 		fmt.Printf("  Type: %v\n", s.Type)
 		fmt.Printf("  ID: %v\n", s.ID)
@@ -221,15 +222,12 @@ func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter str
 		fmt.Printf("    Context: %v\n", s.Attributes.Context)
 		fmt.Printf("    Strings:\n")
 		fmt.Printf("      Other: %v\n", s.Attributes.Strings.Other)
-
-		// !ToDo: Check the Tags type
 		if len(s.Attributes.Tags) > 0 {
 			fmt.Printf("    Tags:\n")
 			for _, v := range s.Attributes.Tags {
 				fmt.Printf("      - %v\n", v)
 			}
 		}
-
 		fmt.Printf("    Occurrences: %v\n", s.Attributes.Occurrences)
 		fmt.Printf("    DeveloperComment: %v\n", s.Attributes.DeveloperComment)
 		fmt.Printf("    Instructions: %v\n", s.Attributes.Instructions)
@@ -239,7 +237,6 @@ func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter str
 		fmt.Printf("    DatetimeCreated: %v\n", s.Attributes.DatetimeCreated)
 		fmt.Printf("    MetadataDatetimeModified: %v\n", s.Attributes.MetadataDatetimeModified)
 		fmt.Printf("    StringsDatetimeModified: %v\n", s.Attributes.StringsDatetimeModified)
-
 		fmt.Printf("  Relationships:\n")
 		fmt.Printf("    Resource:\n")
 		fmt.Printf("      Data:\n")
@@ -261,6 +258,7 @@ func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter str
 		fmt.Printf("        Related: %v\n", s.Relationships.Committer.Links.Related)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", s.Links.Self)
+
 	case "json":
 		text2print, err := json.Marshal(s)
 		if err != nil {

@@ -67,8 +67,8 @@ func (t *TransifexApiClient) GetUserDetails(user_id string) (User, error) {
 // The function prints the information about a user
 func (t *TransifexApiClient) PrintUser(u User, formatter string) {
 	switch formatter {
-	case "text":
 
+	case "text":
 		fmt.Printf("  ID: %v\n", u.ID)
 		fmt.Printf("  Type: %v\n", u.Type)
 		fmt.Printf("  Attributes:\n")
