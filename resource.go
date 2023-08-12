@@ -55,7 +55,7 @@ type Resource struct {
 
 // Get a list of all resources (in a specific project).
 // https://developers.transifex.com/reference/get_resources
-func (t *TransifexApiClient) ListResources(projectID string) ([]Resource, error) {
+func (t *TransifexApiClient) ListResources(project_id string) ([]Resource, error) {
 
 	// Define the variable to decode the service response
 	var r struct {
@@ -73,7 +73,7 @@ func (t *TransifexApiClient) ListResources(projectID string) ([]Resource, error)
 		strings.Join([]string{
 			t.apiURL,
 			"/resources",
-			fmt.Sprintf("?filter[project]=%s", projectID),
+			fmt.Sprintf("?filter[project]=%s", project_id),
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -104,7 +104,7 @@ func (t *TransifexApiClient) ListResources(projectID string) ([]Resource, error)
 
 // Get details of a specific resource.
 // https://developers.transifex.com/reference/get_resources-resource-id
-func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, error) {
+func (t *TransifexApiClient) GetResourceDetails(resource_id string) (Resource, error) {
 
 	// Define the variable to decode the service response
 	var r struct {
@@ -117,7 +117,7 @@ func (t *TransifexApiClient) GetResourceDetails(resourceID string) (Resource, er
 		strings.Join([]string{
 			t.apiURL,
 			"/resources/",
-			resourceID,
+			resource_id,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {

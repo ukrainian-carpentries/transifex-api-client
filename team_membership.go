@@ -51,7 +51,7 @@ type TeamMembership struct {
 
 // Get a list of all resources (in a specific project).
 // https://developers.transifex.com/reference/get_team-memberships
-func (t *TransifexApiClient) ListTeamMemberships(organizationID string) ([]TeamMembership, error) {
+func (t *TransifexApiClient) ListTeamMemberships(organization_id string) ([]TeamMembership, error) {
 
 	// Define the variable to decode the service response
 	var tms struct {
@@ -69,7 +69,7 @@ func (t *TransifexApiClient) ListTeamMemberships(organizationID string) ([]TeamM
 		strings.Join([]string{
 			t.apiURL,
 			"/team_memberships",
-			fmt.Sprintf("?filter[organization]=%s", organizationID),
+			fmt.Sprintf("?filter[organization]=%s", organization_id),
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {

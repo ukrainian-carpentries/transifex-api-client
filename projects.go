@@ -85,7 +85,7 @@ type Project struct {
 
 // Get the list of projects that belong to a single organization.
 // https://developers.transifex.com/reference/get_projects
-func (t *TransifexApiClient) ListProjects(organizationID string) ([]Project, error) {
+func (t *TransifexApiClient) ListProjects(organization_id string) ([]Project, error) {
 
 	// Define the variable to decode the service response
 	var lpr struct {
@@ -103,7 +103,7 @@ func (t *TransifexApiClient) ListProjects(organizationID string) ([]Project, err
 		strings.Join([]string{
 			t.apiURL,
 			"/projects",
-			fmt.Sprintf("?filter[organization]=%s", organizationID),
+			fmt.Sprintf("?filter[organization]=%s", organization_id),
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -134,7 +134,7 @@ func (t *TransifexApiClient) ListProjects(organizationID string) ([]Project, err
 
 // Get the details of a specific project.
 // https://developers.transifex.com/reference/get_projects-project-id
-func (t *TransifexApiClient) GetProjectDetails(projectID string) (Project, error) {
+func (t *TransifexApiClient) GetProjectDetails(project_id string) (Project, error) {
 
 	// Define the variable to decode the service response
 	var pd struct {
@@ -147,7 +147,7 @@ func (t *TransifexApiClient) GetProjectDetails(projectID string) (Project, error
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			projectID,
+			project_id,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -178,7 +178,7 @@ func (t *TransifexApiClient) GetProjectDetails(projectID string) (Project, error
 
 // Get a list of all target languages of a specific project.
 // https://developers.transifex.com/reference/get_projects-project-id-languages
-func (t *TransifexApiClient) ListProjectLanguages(projectID string) ([]Language, error) {
+func (t *TransifexApiClient) ListProjectLanguages(project_id string) ([]Language, error) {
 
 	// Define the variable to decode the service response
 	var pl struct {
@@ -191,7 +191,7 @@ func (t *TransifexApiClient) ListProjectLanguages(projectID string) ([]Language,
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			projectID,
+			project_id,
 			"/languages",
 		}, ""),
 		bytes.NewBuffer(nil))
@@ -223,7 +223,7 @@ func (t *TransifexApiClient) ListProjectLanguages(projectID string) ([]Language,
 
 // List language relationships.
 // https://developers.transifex.com/reference/get_projects-project-id-relationships-languages
-func (t *TransifexApiClient) GetLanguageRelationships(projectID string) ([]LanguageRelationship, error) {
+func (t *TransifexApiClient) GetLanguageRelationships(project_id string) ([]LanguageRelationship, error) {
 
 	// Define the variable to decode the service response
 	var lr struct {
@@ -239,7 +239,7 @@ func (t *TransifexApiClient) GetLanguageRelationships(projectID string) ([]Langu
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			projectID,
+			project_id,
 			"/relationships/languages",
 		}, ""),
 		bytes.NewBuffer(nil))
@@ -271,7 +271,7 @@ func (t *TransifexApiClient) GetLanguageRelationships(projectID string) ([]Langu
 
 // Get project maintainer relationships.
 // https://developers.transifex.com/reference/get_projects-project-id-relationships-maintainers
-func (t *TransifexApiClient) GetProjectMaintainerRelationships(projectID string) ([]MaintainerRelationship, error) {
+func (t *TransifexApiClient) GetProjectMaintainerRelationships(project_id string) ([]MaintainerRelationship, error) {
 
 	// Define the variable to decode the service response
 	var pmr struct {
@@ -289,7 +289,7 @@ func (t *TransifexApiClient) GetProjectMaintainerRelationships(projectID string)
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			projectID,
+			project_id,
 			"/relationships/maintainers",
 		}, ""),
 		bytes.NewBuffer(nil))
@@ -321,7 +321,7 @@ func (t *TransifexApiClient) GetProjectMaintainerRelationships(projectID string)
 
 // Get team relationship.
 // https://developers.transifex.com/reference/get_projects-project-id-relationships-team
-func (t *TransifexApiClient) GetTeamRelationship(projectID string) (TeamRelationship, error) {
+func (t *TransifexApiClient) GetTeamRelationship(project_id string) (TeamRelationship, error) {
 
 	// Define the variable to decode the service response
 	var tr struct {
@@ -338,7 +338,7 @@ func (t *TransifexApiClient) GetTeamRelationship(projectID string) (TeamRelation
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			projectID,
+			project_id,
 			"/relationships/team",
 		}, ""),
 		bytes.NewBuffer(nil))

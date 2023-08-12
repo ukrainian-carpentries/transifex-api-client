@@ -69,7 +69,7 @@ type ResourceStringRevision interface{}
 
 // Get resource strings collection.
 // https://developers.transifex.com/reference/get_resource-strings
-func (t *TransifexApiClient) GetResourceStringsCollection(resourceID string) ([]ResourceString, error) {
+func (t *TransifexApiClient) GetResourceStringsCollection(resource_id string) ([]ResourceString, error) {
 
 	// Define the variable to decode the service response
 	var rsc struct {
@@ -87,7 +87,7 @@ func (t *TransifexApiClient) GetResourceStringsCollection(resourceID string) ([]
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_strings",
-			fmt.Sprintf("?filter[resource]=%s", resourceID),
+			fmt.Sprintf("?filter[resource]=%s", resource_id),
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -118,7 +118,7 @@ func (t *TransifexApiClient) GetResourceStringsCollection(resourceID string) ([]
 
 // Get the details of a specific resource string.
 // https://developers.transifex.com/reference/get_resource-strings-resource-string-id
-func (t *TransifexApiClient) GetResourceStringDetails(resourceStringID string) (ResourceString, error) {
+func (t *TransifexApiClient) GetResourceStringDetails(resource_string_id string) (ResourceString, error) {
 
 	// Define the variable to decode the service response
 	var rsd struct {
@@ -131,7 +131,7 @@ func (t *TransifexApiClient) GetResourceStringDetails(resourceStringID string) (
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_strings/",
-			resourceStringID,
+			resource_string_id,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -162,7 +162,7 @@ func (t *TransifexApiClient) GetResourceStringDetails(resourceStringID string) (
 
 // Get revisions of resource strings.
 // https://developers.transifex.com/reference/get_resource-strings-revisions
-func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resourceStringID string) ([]ResourceStringRevision, error) {
+func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resource_string_id string) ([]ResourceStringRevision, error) {
 
 	// Define the variable to decode the service response
 	var rors struct {

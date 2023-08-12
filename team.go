@@ -85,7 +85,7 @@ type TeamManagerRelationship struct {
 
 // Get the list of teams that belong to a single organization.
 // https://developers.transifex.com/reference/get_teams
-func (t *TransifexApiClient) ListTeams(organizationID string) ([]Team, error) {
+func (t *TransifexApiClient) ListTeams(organization_id string) ([]Team, error) {
 
 	// Define the variable to decode the service response
 	var ts struct {
@@ -103,7 +103,7 @@ func (t *TransifexApiClient) ListTeams(organizationID string) ([]Team, error) {
 		strings.Join([]string{
 			t.apiURL,
 			"/teams",
-			fmt.Sprintf("?filter[organization]=%s", organizationID),
+			fmt.Sprintf("?filter[organization]=%s", organization_id),
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -134,7 +134,7 @@ func (t *TransifexApiClient) ListTeams(organizationID string) ([]Team, error) {
 
 // Get the details of a single team.
 // https://developers.transifex.com/reference/get_teams-team-id
-func (t *TransifexApiClient) GetTeamDetail(teamID string) (Team, error) {
+func (t *TransifexApiClient) GetTeamDetail(team_id string) (Team, error) {
 
 	// Define the variable to decode the service response
 	var td struct {
@@ -147,7 +147,7 @@ func (t *TransifexApiClient) GetTeamDetail(teamID string) (Team, error) {
 		strings.Join([]string{
 			t.apiURL,
 			"/teams/",
-			teamID,
+			team_id,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -178,7 +178,7 @@ func (t *TransifexApiClient) GetTeamDetail(teamID string) (Team, error) {
 
 // Get the managers of a team.
 // https://developers.transifex.com/reference/get_teams-team-id-managers
-func (t *TransifexApiClient) GetTeamManagers(teamID string) ([]TeamManager, error) {
+func (t *TransifexApiClient) GetTeamManagers(team_id string) ([]TeamManager, error) {
 
 	// Define the variable to decode the service response
 	var tms struct {
@@ -196,7 +196,7 @@ func (t *TransifexApiClient) GetTeamManagers(teamID string) ([]TeamManager, erro
 		strings.Join([]string{
 			t.apiURL,
 			"/teams/",
-			teamID,
+			team_id,
 			"/managers",
 		}, ""),
 		bytes.NewBuffer(nil))
@@ -228,7 +228,7 @@ func (t *TransifexApiClient) GetTeamManagers(teamID string) ([]TeamManager, erro
 
 // Get team manager relationships.
 // https://developers.transifex.com/reference/get_teams-team-id-relationships-managers
-func (t *TransifexApiClient) GetTeamManagerRelationships(teamID string) ([]TeamManagerRelationship, error) {
+func (t *TransifexApiClient) GetTeamManagerRelationships(team_id string) ([]TeamManagerRelationship, error) {
 
 	// Define the variable to decode the service response
 	var tmrs struct {
@@ -246,7 +246,7 @@ func (t *TransifexApiClient) GetTeamManagerRelationships(teamID string) ([]TeamM
 		strings.Join([]string{
 			t.apiURL,
 			"/teams/",
-			teamID,
+			team_id,
 			"/relationships/managers",
 		}, ""),
 		bytes.NewBuffer(nil))
@@ -305,7 +305,7 @@ func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 		fmt.Printf("        Self: %v\n", tt.Relationships.Managers.Links.Self)
 		fmt.Printf("  Links:\n")
 		fmt.Printf("    Self: %v\n", tt.Links.Self)
-		
+
 	case "json":
 		text2print, err := json.Marshal(tt)
 		if err != nil {
