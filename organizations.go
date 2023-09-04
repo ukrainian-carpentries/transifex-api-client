@@ -35,9 +35,19 @@ type Organization struct {
 	} `json:"relationships"`
 }
 
+type ListOrganizationsParameters struct {
+	Cursor string
+	Slug   string
+}
+
 // Get a list of all the Organizations the user belongs to.
 // https://developers.transifex.com/reference/get_organizations
-func (t *TransifexApiClient) ListOrganizations() ([]Organization, error) {
+func (t *TransifexApiClient) ListOrganizations(params ListOrganizationsParameters) ([]Organization, error) {
+
+	paramStr, err := t.createListOrganizationsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var lor struct {
@@ -55,6 +65,7 @@ func (t *TransifexApiClient) ListOrganizations() ([]Organization, error) {
 		strings.Join([]string{
 			t.apiURL,
 			"/organizations",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -160,4 +171,30 @@ func (t *TransifexApiClient) PrintOrganization(o Organization, formatter string)
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListOrganizationsParametersString(params ListOrganizationsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional slug of the organization to get details
+	if params.Slug != "" {
+		paramStr += "&filter[slug]=" + params.Slug
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
