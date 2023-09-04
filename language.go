@@ -47,8 +47,6 @@ func (t *TransifexApiClient) ListLanguages(params ListLanguagesParameters) ([]La
 		return nil, err
 	}
 
-	fmt.Printf("paramStr: %v\n", paramStr)
-
 	// Define the variable to decode the service response
 	var ls struct {
 		Data  []Language `json:"data"`
