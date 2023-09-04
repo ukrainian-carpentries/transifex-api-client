@@ -105,6 +105,7 @@ func (t *TransifexApiClient) PrintI18nFormat(i I18nFormat, formatter string) {
 	}
 }
 
+// The function checks the input set of parameters and converts it into a valid URL parameters string
 func (t *TransifexApiClient) createListI18nParametersString(params ListI18nFormatsParameters) (string, error) {
 	// Initialize the parameters string
 	paramStr := ""
