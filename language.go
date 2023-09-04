@@ -34,9 +34,20 @@ type LanguageRelationship struct {
 	ID   string `json:"id"`
 }
 
+type ListLanguagesParameters struct {
+	Code string
+}
+
 // Get information for all the supported languages.
 // https://developers.transifex.com/reference/get_languages
-func (t *TransifexApiClient) ListLanguages() ([]Language, error) {
+func (t *TransifexApiClient) ListLanguages(params ListLanguagesParameters) ([]Language, error) {
+
+	paramStr, err := t.createListLanguagesParametersString(params)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("paramStr: %v\n", paramStr)
 
 	// Define the variable to decode the service response
 	var ls struct {
@@ -54,6 +65,7 @@ func (t *TransifexApiClient) ListLanguages() ([]Language, error) {
 		strings.Join([]string{
 			t.apiURL,
 			"/languages",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -157,4 +169,22 @@ func (t *TransifexApiClient) PrintLanguage(l Language, formatter string) {
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListLanguagesParametersString(params ListLanguagesParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add optional Code value
+	if params.Code != "" {
+		paramStr += "&filter[code][any]=" + params.Code
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
