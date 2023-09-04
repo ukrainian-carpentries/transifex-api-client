@@ -83,9 +83,36 @@ type Project struct {
 	Type string `json:"type"`
 }
 
+type ListProjectsParameters struct {
+	Organization string
+	Cursor       string
+	Slug         string
+	Name         string
+}
+
+type GetProjectMaintainersParameters struct {
+	ProjectID string
+	Cursor    string
+}
+
+type ListLanguageRelationshipsParameters struct {
+	ProjectID string
+	Cursor    string
+}
+
+type GetProjectMaintainerRelationshipsParameters struct {
+	ProjectID string
+	Cursor    string
+}
+
 // Get the list of projects that belong to a single organization.
 // https://developers.transifex.com/reference/get_projects
-func (t *TransifexApiClient) ListProjects(organization_id string) ([]Project, error) {
+func (t *TransifexApiClient) ListProjects(params ListProjectsParameters) ([]Project, error) {
+
+	paramStr, err := t.createListProjectsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var lpr struct {
@@ -103,7 +130,7 @@ func (t *TransifexApiClient) ListProjects(organization_id string) ([]Project, er
 		strings.Join([]string{
 			t.apiURL,
 			"/projects",
-			fmt.Sprintf("?filter[organization]=%s", organization_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -221,9 +248,65 @@ func (t *TransifexApiClient) ListProjectLanguages(project_id string) ([]Language
 	return pl.Data, nil
 }
 
+// Get project maintainers.
+// https://developers.transifex.com/reference/get_projects-project-id-maintainers
+func (t *TransifexApiClient) GetProjectMaintainers(params GetProjectMaintainersParameters) ([]Maintainer, error) {
+
+	paramStr, err := t.createGetProjectMaintainersParametersString(params)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the variable to decode the service response
+	var pl struct {
+		Data []Maintainer `json:"data"`
+	}
+
+	// Create an API request
+	req, err := http.NewRequest(
+		"GET",
+		strings.Join([]string{
+			t.apiURL,
+			"/projects/",
+			params.ProjectID,
+			"/maintainers",
+			paramStr,
+		}, ""),
+		bytes.NewBuffer(nil))
+	if err != nil {
+		t.l.Error(err)
+		return nil, err
+	}
+
+	// Set authorization and Accept HTTP request headers
+	req.Header.Set("Authorization", "Bearer "+t.token)
+	req.Header.Add("Accept", "application/vnd.api+json")
+
+	// Perform the request
+	resp, err := t.client.Do(req)
+	if err != nil {
+		t.l.Error(err)
+		return nil, err
+	}
+
+	// Decode the JSON response into the corresponding variable
+	err = json.NewDecoder(resp.Body).Decode(&pl)
+	if err != nil {
+		t.l.Error(err)
+		return nil, err
+	}
+
+	return pl.Data, nil
+}
+
 // List language relationships.
 // https://developers.transifex.com/reference/get_projects-project-id-relationships-languages
-func (t *TransifexApiClient) GetLanguageRelationships(project_id string) ([]LanguageRelationship, error) {
+func (t *TransifexApiClient) GetLanguageRelationships(params ListLanguageRelationshipsParameters) ([]LanguageRelationship, error) {
+
+	paramStr, err := t.createListLanguageRelationshipsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var lr struct {
@@ -239,8 +322,9 @@ func (t *TransifexApiClient) GetLanguageRelationships(project_id string) ([]Lang
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			project_id,
+			params.ProjectID,
 			"/relationships/languages",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -271,7 +355,12 @@ func (t *TransifexApiClient) GetLanguageRelationships(project_id string) ([]Lang
 
 // Get project maintainer relationships.
 // https://developers.transifex.com/reference/get_projects-project-id-relationships-maintainers
-func (t *TransifexApiClient) GetProjectMaintainerRelationships(project_id string) ([]MaintainerRelationship, error) {
+func (t *TransifexApiClient) GetProjectMaintainerRelationships(params GetProjectMaintainerRelationshipsParameters) ([]MaintainerRelationship, error) {
+
+	paramStr, err := t.createGetProjectMaintainerRelationshipsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var pmr struct {
@@ -289,8 +378,9 @@ func (t *TransifexApiClient) GetProjectMaintainerRelationships(project_id string
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			project_id,
+			params.ProjectID,
 			"/relationships/maintainers",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -444,4 +534,95 @@ func (t *TransifexApiClient) PrintProject(p Project, formatter string) {
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListProjectsParametersString(params ListProjectsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization ID option
+	if params.Organization == "" {
+		return "", fmt.Errorf("mandatory parameter 'Organization' is missed")
+	}
+	paramStr += "&filter[organization]=" + params.Organization
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional Slug value
+	if params.Slug != "" {
+		paramStr += "&filter[slug]=" + params.Slug
+	}
+
+	// Add optional Name value
+	if params.Name != "" {
+		paramStr += "&filter[name]=" + params.Name
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetProjectMaintainersParametersString(params GetProjectMaintainersParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add optional Code value
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListLanguageRelationshipsParametersString(params ListLanguageRelationshipsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add optional Code value
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetProjectMaintainerRelationshipsParametersString(params GetProjectMaintainerRelationshipsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add optional Code value
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
