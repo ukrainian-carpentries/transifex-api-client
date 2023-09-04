@@ -91,18 +91,18 @@ type ListProjectsParameters struct {
 }
 
 type GetProjectMaintainersParameters struct {
-	ProjectID string
-	Cursor    string
+	Project_id string
+	Cursor     string
 }
 
 type ListLanguageRelationshipsParameters struct {
-	ProjectID string
-	Cursor    string
+	Project_id string
+	Cursor     string
 }
 
 type GetProjectMaintainerRelationshipsParameters struct {
-	ProjectID string
-	Cursor    string
+	Project_id string
+	Cursor     string
 }
 
 // Get the list of projects that belong to a single organization.
@@ -268,7 +268,7 @@ func (t *TransifexApiClient) GetProjectMaintainers(params GetProjectMaintainersP
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			params.ProjectID,
+			params.Project_id,
 			"/maintainers",
 			paramStr,
 		}, ""),
@@ -322,7 +322,7 @@ func (t *TransifexApiClient) GetLanguageRelationships(params ListLanguageRelatio
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			params.ProjectID,
+			params.Project_id,
 			"/relationships/languages",
 			paramStr,
 		}, ""),
@@ -378,7 +378,7 @@ func (t *TransifexApiClient) GetProjectMaintainerRelationships(params GetProject
 		strings.Join([]string{
 			t.apiURL,
 			"/projects/",
-			params.ProjectID,
+			params.Project_id,
 			"/relationships/maintainers",
 			paramStr,
 		}, ""),
