@@ -20,12 +20,22 @@ type I18nFormat struct {
 	} `json:"attributes"`
 }
 
+type ListI18nFormatsParameters struct {
+	OrganizationID string
+	Name           string
+}
+
 // Get information for all the supported i18n formats.
 // https://developers.transifex.com/reference/get_i18n-formats
 //
 // For more information check
 // https://help.transifex.com/en/articles/6219670-introduction-to-file-formats
-func (t *TransifexApiClient) ListI18nFormats(organization_id string) ([]I18nFormat, error) {
+func (t *TransifexApiClient) ListI18nFormats(params ListI18nFormatsParameters) ([]I18nFormat, error) {
+
+	paramStr, err := t.createListI18nParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var i18nfs struct {
@@ -38,7 +48,7 @@ func (t *TransifexApiClient) ListI18nFormats(organization_id string) ([]I18nForm
 		strings.Join([]string{
 			t.apiURL,
 			"/i18n_formats",
-			fmt.Sprintf("?filter[organization]=%s", organization_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -93,4 +103,27 @@ func (t *TransifexApiClient) PrintI18nFormat(i I18nFormat, formatter string) {
 
 	default:
 	}
+}
+
+func (t *TransifexApiClient) createListI18nParametersString(params ListI18nFormatsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization ID option
+	if params.OrganizationID == "" {
+		return "", fmt.Errorf("mandatory parameter 'OrganizationID' is missed")
+	}
+	paramStr += "&filter[organization]=" + params.OrganizationID
+
+	// Add I18n format name option
+	if params.Name != "" {
+		paramStr += "&filter[name]=" + params.Name
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
