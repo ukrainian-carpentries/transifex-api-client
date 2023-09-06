@@ -216,7 +216,7 @@ func (t *TransifexApiClient) createListResourcesParametersString(params ListReso
 	// Initialize the parameters string
 	paramStr := ""
 
-	// Add mandatory Organization ID option
+	// Add mandatory Project option
 	if params.Project == "" {
 		return "", fmt.Errorf("mandatory parameter 'Project' is missed")
 	}
