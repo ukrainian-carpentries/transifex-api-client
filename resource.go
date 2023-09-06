@@ -53,9 +53,21 @@ type Resource struct {
 	} `json:"links"`
 }
 
+type ListResourcesParameters struct {
+	Project string
+	Cursor  string
+	Slug    string
+	Name    string
+}
+
 // Get a list of all resources (in a specific project).
 // https://developers.transifex.com/reference/get_resources
-func (t *TransifexApiClient) ListResources(project_id string) ([]Resource, error) {
+func (t *TransifexApiClient) ListResources(params ListResourcesParameters) ([]Resource, error) {
+
+	paramStr, err := t.createListResourcesParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var r struct {
@@ -73,7 +85,7 @@ func (t *TransifexApiClient) ListResources(project_id string) ([]Resource, error
 		strings.Join([]string{
 			t.apiURL,
 			"/resources",
-			fmt.Sprintf("?filter[project]=%s", project_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -197,4 +209,38 @@ func (t *TransifexApiClient) PrintResource(r Resource, formatter string) {
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListResourcesParametersString(params ListResourcesParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization ID option
+	if params.Project == "" {
+		return "", fmt.Errorf("mandatory parameter 'Project' is missed")
+	}
+	paramStr += "&filter[project]=" + params.Project
+
+	// Add Cursor option
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add Slug option
+	if params.Slug != "" {
+		paramStr += "&filter[slug]=" + params.Slug
+	}
+
+	// Add Name option
+	if params.Name != "" {
+		paramStr += "&filter[name]=" + params.Name
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
