@@ -54,10 +54,22 @@ type ResourseLanguageStat struct {
 	} `json:"relationships"`
 }
 
+type GetResourceLanguageStatsCollectionParameters struct {
+	Project  string
+	Resource string
+	Language string
+	Cursor   string
+}
+
 // Get the statistics for a set of resources.
 // You must specify at least a project and optionally a language/resource to filter against.
 // https://developers.transifex.com/reference/get_resource-language-stats
-func (t *TransifexApiClient) GetResourceLanguageStatsCollection(project_id string) ([]ResourseLanguageStat, error) {
+func (t *TransifexApiClient) GetResourceLanguageStatsCollection(params GetResourceLanguageStatsCollectionParameters) ([]ResourseLanguageStat, error) {
+
+	paramStr, err := t.createGetResourceLanguageStatsCollectionParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var rlsc struct {
@@ -75,7 +87,7 @@ func (t *TransifexApiClient) GetResourceLanguageStatsCollection(project_id strin
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_language_stats",
-			fmt.Sprintf("?filter[project]=%s", project_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -196,4 +208,38 @@ func (t *TransifexApiClient) PrintResourseLanguageStat(r ResourseLanguageStat, f
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetResourceLanguageStatsCollectionParametersString(params GetResourceLanguageStatsCollectionParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Project option
+	if params.Project == "" {
+		return "", fmt.Errorf("mandatory parameter 'Project' is missed")
+	}
+	paramStr += "&filter[project]=" + params.Project
+
+	// Add Resource option
+	if params.Resource != "" {
+		paramStr += "&filter[resource]=" + params.Resource
+	}
+
+	// Add Language option
+	if params.Language != "" {
+		paramStr += "&filter[language]=" + params.Language
+	}
+
+	// Add Cursor option
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
