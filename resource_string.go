@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type ResourceString struct {
@@ -65,11 +67,34 @@ type ResourceString struct {
 	Type string `json:"type"`
 }
 
+type GetResourceStringsCollectionParameters struct {
+	Resource              string
+	Cursor                string
+	DatetimeCreatedAfter  time.Time
+	DatetimeCreatedBefore time.Time
+	Key                   string
+	Tags                  []string
+	Limit                 string
+}
+
+type GetRevisionsOfResourceStringsParameters struct {
+	Resource string
+	Key      string
+	Tags     []string
+	Cursor   string
+	Limit    string
+}
+
 type ResourceStringRevision interface{}
 
 // Get resource strings collection.
 // https://developers.transifex.com/reference/get_resource-strings
-func (t *TransifexApiClient) GetResourceStringsCollection(resource_id string) ([]ResourceString, error) {
+func (t *TransifexApiClient) GetResourceStringsCollection(params GetResourceStringsCollectionParameters) ([]ResourceString, error) {
+
+	paramStr, err := t.createGetResourceStringsCollectionParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var rsc struct {
@@ -87,7 +112,7 @@ func (t *TransifexApiClient) GetResourceStringsCollection(resource_id string) ([
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_strings",
-			fmt.Sprintf("?filter[resource]=%s", resource_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -162,7 +187,12 @@ func (t *TransifexApiClient) GetResourceStringDetails(resource_string_id string)
 
 // Get revisions of resource strings.
 // https://developers.transifex.com/reference/get_resource-strings-revisions
-func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resource_string_id string) ([]ResourceStringRevision, error) {
+func (t *TransifexApiClient) GetRevisionsOfResourceStrings(params GetRevisionsOfResourceStringsParameters) ([]ResourceStringRevision, error) {
+
+	paramStr, err := t.createGetRevisionsOfResourceStringsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var rors struct {
@@ -180,6 +210,7 @@ func (t *TransifexApiClient) GetRevisionsOfResourceStrings(resource_string_id st
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_strings_revisions",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -268,4 +299,124 @@ func (t *TransifexApiClient) PrintResourseString(s ResourceString, formatter str
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetResourceStringsCollectionParametersString(params GetResourceStringsCollectionParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Resource option
+	if params.Resource == "" {
+		return "", fmt.Errorf("mandatory parameter 'Resource' is missed")
+	}
+	paramStr += "&filter[resource]=" + params.Resource
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional datetime_created->gte value
+	if (params.DatetimeCreatedAfter != time.Time{}) {
+		paramStr += "&filter[datetime_created][gte]=" + params.DatetimeCreatedAfter.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add optional datetime_created->lt value
+	if (params.DatetimeCreatedBefore != time.Time{}) {
+		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Exact match for the key of the resource string.
+	//! This filter is case sensitive.
+	if params.Key != "" {
+		paramStr += "&filter[key]=" + params.Key
+	}
+
+	// Add Tags option
+	if len(params.Tags) != 0 {
+		paramStr += "&filter[tags][all]=" + strings.Join(params.Tags, ",")
+	}
+
+	// The page size limit. If not set, the default value is 150.
+	// If set, the minimum value it can take is 150 and the maximum 1000.
+	if params.Limit != "" {
+		num, err := strconv.Atoi(params.Limit)
+		if err != nil {
+			return "", fmt.Errorf("unable to convert 'Limit' value to int")
+		}
+
+		if num < 150 || num > 1000 {
+			return "", fmt.Errorf("value of 'Limit' parameter should be in the range [150..1000]")
+		}
+
+		paramStr += "&limit=" + params.Limit
+	} else {
+		paramStr += "&limit=150"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetRevisionsOfResourceStringsParametersString(params GetRevisionsOfResourceStringsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Resource option
+	if params.Resource == "" {
+		return "", fmt.Errorf("mandatory parameter 'Resource' is missed")
+	}
+	paramStr += "&filter[resource_string][resource]=" + params.Resource
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Exact match for the key of the resource string.
+	//! This filter is case sensitive.
+	if params.Key != "" {
+		paramStr += "&filter[resource_string][key]=" + params.Key
+	}
+
+	// Add Tags option
+	if len(params.Tags) != 0 {
+		paramStr += "&filter[resource_string][tags][all]=" + strings.Join(params.Tags, ",")
+	}
+
+	// The page size limit. If not set, the default value is 150.
+	// If set, the minimum value it can take is 150 and the maximum 1000.
+	if params.Limit != "" {
+		num, err := strconv.Atoi(params.Limit)
+		if err != nil {
+			return "", fmt.Errorf("unable to convert 'Limit' value to int")
+		}
+
+		if num < 150 || num > 1000 {
+			return "", fmt.Errorf("value of 'Limit' parameter should be in the range [150..1000]")
+		}
+
+		paramStr += "&limit=" + params.Limit
+	} else {
+		paramStr += "&limit=150"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
