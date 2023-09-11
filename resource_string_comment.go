@@ -76,18 +76,18 @@ type ResourceStringComment struct {
 }
 
 type ListResourceStringCommentsParameters struct {
-	Organization          string
-	Project               string
-	Cursor                string
-	Category              string
-	Author                string
-	DatetimeCreatedAfter  time.Time
-	DatetimeCreatedBefore time.Time
-	Priority              string
-	Resource              string
-	ResourceString        string
-	Status                string
-	Type                  string
+	Organization   string
+	Project        string
+	Cursor         string
+	Category       string
+	Author         string
+	CreatedAfter   time.Time
+	CreatedBefore  time.Time
+	Priority       string
+	Resource       string
+	ResourceString string
+	Status         string
+	Type           string
 }
 
 // Get resource strings collection.
@@ -287,13 +287,13 @@ func (t *TransifexApiClient) createListResourceStringCommentsParametersString(pa
 	}
 
 	// Add optional datetime_created->gte value
-	if (params.DatetimeCreatedAfter != time.Time{}) {
-		paramStr += "&filter[datetime_created][gte]=" + params.DatetimeCreatedAfter.Format("2006-01-02T15:04:05Z")
+	if (params.CreatedAfter != time.Time{}) {
+		paramStr += "&filter[datetime_created][gte]=" + params.CreatedAfter.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add optional datetime_created->lt value
-	if (params.DatetimeCreatedBefore != time.Time{}) {
-		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
+	if (params.CreatedBefore != time.Time{}) {
+		paramStr += "&filter[datetime_created][lt]=" + params.CreatedBefore.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add allowed Priority option

@@ -89,23 +89,23 @@ type ResourceTranslation struct {
 }
 
 type GetResourceTranslationsCollectionParameters struct {
-	Resource                 string
-	Language                 string
-	Cursor                   string
-	DatetimeTranslatedAfter  time.Time
-	DatetimeTranslatedBefore time.Time
-	Key                      string
-	DatetimeModifiedAfter    time.Time
-	DatetimeModifiedBefore   time.Time
-	IsTranslated             string
-	IsReviewed               string
-	IsProofreaded            string
-	IsFinalized              string
-	TranslatedBy             string
-	Origin                   string
-	Include                  string
-	Tags                     []string
-	Limit                    string
+	Resource         string
+	Language         string
+	Cursor           string
+	TranslatedAfter  time.Time
+	TranslatedBefore time.Time
+	Key              string
+	ModifiedAfter    time.Time
+	ModifiedBefore   time.Time
+	IsTranslated     string
+	IsReviewed       string
+	IsProofreaded    string
+	IsFinalized      string
+	TranslatedBy     string
+	Origin           string
+	Include          string
+	Tags             []string
+	Limit            string
 }
 
 type GetResourceTranslationDetailsParameters struct {
@@ -363,13 +363,13 @@ func (t *TransifexApiClient) createGetResourceTranslationsCollectionParametersSt
 	}
 
 	// Add optional date_translated->gte value
-	if (params.DatetimeTranslatedAfter != time.Time{}) {
-		paramStr += "&filter[date_translated][gt]=" + params.DatetimeTranslatedAfter.Format("2006-01-02T15:04:05Z")
+	if (params.TranslatedAfter != time.Time{}) {
+		paramStr += "&filter[date_translated][gt]=" + params.TranslatedAfter.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add optional date_translated->lt value
-	if (params.DatetimeTranslatedBefore != time.Time{}) {
-		paramStr += "&filter[date_translated][lt]=" + params.DatetimeTranslatedBefore.Format("2006-01-02T15:04:05Z")
+	if (params.TranslatedBefore != time.Time{}) {
+		paramStr += "&filter[date_translated][lt]=" + params.TranslatedBefore.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Exact match for the key of the resource string.
@@ -379,13 +379,13 @@ func (t *TransifexApiClient) createGetResourceTranslationsCollectionParametersSt
 	}
 
 	// Add optional date_translated->gte value
-	if (params.DatetimeModifiedAfter != time.Time{}) {
-		paramStr += "&filter[resource_string][date_modified][gte]=" + params.DatetimeModifiedAfter.Format("2006-01-02T15:04:05Z")
+	if (params.ModifiedAfter != time.Time{}) {
+		paramStr += "&filter[resource_string][date_modified][gte]=" + params.ModifiedAfter.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add optional date_translated->lt value
-	if (params.DatetimeModifiedBefore != time.Time{}) {
-		paramStr += "&filter[resource_string][date_modified][lte]=" + params.DatetimeModifiedBefore.Format("2006-01-02T15:04:05Z")
+	if (params.ModifiedBefore != time.Time{}) {
+		paramStr += "&filter[resource_string][date_modified][lte]=" + params.ModifiedBefore.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add allowed IsTranslated value

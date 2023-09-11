@@ -68,13 +68,13 @@ type ResourceString struct {
 }
 
 type GetResourceStringsCollectionParameters struct {
-	Resource              string
-	Cursor                string
-	DatetimeCreatedAfter  time.Time
-	DatetimeCreatedBefore time.Time
-	Key                   string
-	Tags                  []string
-	Limit                 string
+	Resource      string
+	Cursor        string
+	CreatedAfter  time.Time
+	CreatedBefore time.Time
+	Key           string
+	Tags          []string
+	Limit         string
 }
 
 type GetRevisionsOfResourceStringsParameters struct {
@@ -321,13 +321,13 @@ func (t *TransifexApiClient) createGetResourceStringsCollectionParametersString(
 	}
 
 	// Add optional datetime_created->gte value
-	if (params.DatetimeCreatedAfter != time.Time{}) {
-		paramStr += "&filter[datetime_created][gte]=" + params.DatetimeCreatedAfter.Format("2006-01-02T15:04:05Z")
+	if (params.CreatedAfter != time.Time{}) {
+		paramStr += "&filter[datetime_created][gte]=" + params.CreatedAfter.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Add optional datetime_created->lt value
-	if (params.DatetimeCreatedBefore != time.Time{}) {
-		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
+	if (params.CreatedBefore != time.Time{}) {
+		paramStr += "&filter[datetime_created][lt]=" + params.CreatedBefore.Format("2006-01-02T15:04:05Z")
 	}
 
 	// Exact match for the key of the resource string.
