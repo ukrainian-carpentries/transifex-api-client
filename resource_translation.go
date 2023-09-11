@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -87,9 +88,39 @@ type ResourceTranslation struct {
 	} `json:"links"`
 }
 
+type GetResourceTranslationsCollectionParameters struct {
+	Resource                 string
+	Language                 string
+	Cursor                   string
+	DatetimeTranslatedAfter  time.Time
+	DatetimeTranslatedBefore time.Time
+	Key                      string
+	DatetimeModifiedAfter    time.Time
+	DatetimeModifiedBefore   time.Time
+	IsTranslated             string
+	IsReviewed               string
+	IsProofreaded            string
+	IsFinalized              string
+	TranslatedBy             string
+	Origin                   string
+	Include                  string
+	Tags                     []string
+	Limit                    string
+}
+
+type GetResourceTranslationDetailsParameters struct {
+	ResourceTranslation string
+	Include             string
+}
+
 // Get a Resource Translations collection.
 // https://developers.transifex.com/reference/get_resource-translations
-func (t *TransifexApiClient) GetResourceTranslationsCollection(resourceID, language string) ([]ResourceTranslation, error) {
+func (t *TransifexApiClient) GetResourceTranslationsCollection(params GetResourceTranslationsCollectionParameters) ([]ResourceTranslation, error) {
+
+	paramStr, err := t.createGetResourceTranslationsCollectionParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var rtc struct {
@@ -162,8 +193,7 @@ func (t *TransifexApiClient) GetResourceTranslationsCollection(resourceID, langu
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_translations",
-			fmt.Sprintf("?filter[resource]=%s", resourceID),
-			fmt.Sprintf("&filter[language]=%s", language),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -194,7 +224,12 @@ func (t *TransifexApiClient) GetResourceTranslationsCollection(resourceID, langu
 
 // Get a Resource Translation details.
 // https://developers.transifex.com/reference/get_resource-translations
-func (t *TransifexApiClient) GetResourceTranslationDetails(resource_translation_id string) (ResourceTranslation, error) {
+func (t *TransifexApiClient) GetResourceTranslationDetails(params GetResourceTranslationDetailsParameters) (ResourceTranslation, error) {
+
+	paramStr, err := t.createGetResourceTranslationDetailsParametersString(params)
+	if err != nil {
+		return ResourceTranslation{}, err
+	}
 
 	// Define the variable to decode the service response
 	var rt struct {
@@ -207,7 +242,8 @@ func (t *TransifexApiClient) GetResourceTranslationDetails(resource_translation_
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_translations/",
-			resource_translation_id,
+			params.ResourceTranslation,
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -299,4 +335,202 @@ func (t *TransifexApiClient) PrintResourceTranslation(r ResourceTranslation, for
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetResourceTranslationsCollectionParametersString(params GetResourceTranslationsCollectionParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Resource option
+	if params.Resource == "" {
+		return "", fmt.Errorf("mandatory parameter 'Resource' is missed")
+	}
+	paramStr += "&filter[resource]=" + params.Resource
+
+	// Add mandatory Language option
+	if params.Language == "" {
+		return "", fmt.Errorf("mandatory parameter 'Language' is missed")
+	}
+	paramStr += "&filter[language]=" + params.Language
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional date_translated->gte value
+	if (params.DatetimeTranslatedAfter != time.Time{}) {
+		paramStr += "&filter[date_translated][gt]=" + params.DatetimeTranslatedAfter.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add optional date_translated->lt value
+	if (params.DatetimeTranslatedBefore != time.Time{}) {
+		paramStr += "&filter[date_translated][lt]=" + params.DatetimeTranslatedBefore.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Exact match for the key of the resource string.
+	//! This filter is case sensitive.
+	if params.Key != "" {
+		paramStr += "&filter[resource_string][key]=" + params.Key
+	}
+
+	// Add optional date_translated->gte value
+	if (params.DatetimeModifiedAfter != time.Time{}) {
+		paramStr += "&filter[resource_string][date_modified][gte]=" + params.DatetimeModifiedAfter.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add optional date_translated->lt value
+	if (params.DatetimeModifiedBefore != time.Time{}) {
+		paramStr += "&filter[resource_string][date_modified][lte]=" + params.DatetimeModifiedBefore.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add allowed IsTranslated value
+	switch strings.ToLower(params.IsTranslated) {
+	case "true":
+		fallthrough
+	case "false":
+		paramStr += "&filter[translated]=" + strings.ToLower(params.IsTranslated)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'IsTranslated' value")
+	}
+
+	// Add allowed IsReviewed value
+	switch strings.ToLower(params.IsReviewed) {
+	case "true":
+		fallthrough
+	case "false":
+		paramStr += "&filter[reviewed]=" + strings.ToLower(params.IsReviewed)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'IsReviewed' value")
+	}
+
+	// Add allowed IsProofreaded value
+	switch strings.ToLower(params.IsProofreaded) {
+	case "true":
+		fallthrough
+	case "false":
+		paramStr += "&filter[proofread]=" + strings.ToLower(params.IsProofreaded)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'IsProofreaded' value")
+	}
+
+	// Add allowed IsFinalized value
+	switch strings.ToLower(params.IsFinalized) {
+	case "true":
+		fallthrough
+	case "false":
+		paramStr += "&filter[finalized]=" + strings.ToLower(params.IsFinalized)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'IsFinalized' value")
+	}
+
+	// Add optional valid Origin value
+	switch strings.ToUpper(params.Origin) {
+	case "API":
+		fallthrough
+	case "EDITOR":
+		fallthrough
+	case "UPLOAD":
+		fallthrough
+	case "TM":
+		fallthrough
+	case "VENDORS:GENGO":
+		fallthrough
+	case "VENDORS:TEXTMASTER":
+		fallthrough
+	case "VENDORS:E2F":
+		fallthrough
+	case "MT:GOOGLE":
+		fallthrough
+	case "MT:MICROSOFT":
+		fallthrough
+	case "MT:AMAZON":
+		fallthrough
+	case "MT:DEEPL":
+		fallthrough
+	case "AUTOFETCH":
+		fallthrough
+	case "TX:AUTOMATED":
+		fallthrough
+	case "TX:NATIVE_MIGRATION":
+		fallthrough
+	case "TX:PROPAGATED":
+		fallthrough
+	case "TX:MERGED":
+		paramStr += "&filter[origin]=" + strings.ToUpper(params.Origin)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'Origin' value")
+	}
+
+	// Add optional Include value
+	if params.Include != "" {
+		if params.Include != "resource_string" {
+			return "", fmt.Errorf("unknown 'Include' value")
+		}
+		paramStr += "&include=resource_string"
+	}
+
+	// Add Tags option
+	if len(params.Tags) != 0 {
+		paramStr += "&filter[resource_string][tags][all]=" + strings.Join(params.Tags, ",")
+	}
+
+	// The page size limit. If not set, the default value is 150.
+	// If set, the minimum value it can take is 150 and the maximum 1000.
+	if params.Limit != "" {
+		num, err := strconv.Atoi(params.Limit)
+		if err != nil {
+			return "", fmt.Errorf("unable to convert 'Limit' value to int")
+		}
+
+		if num < 150 || num > 1000 {
+			return "", fmt.Errorf("value of 'Limit' parameter should be in the range [150..1000]")
+		}
+
+		paramStr += "&limit=" + params.Limit
+	} else {
+		paramStr += "&limit=150"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetResourceTranslationDetailsParametersString(params GetResourceTranslationDetailsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory ResourceTranslation option
+	if params.ResourceTranslation == "" {
+		return "", fmt.Errorf("mandatory parameter 'ResourceTranslation' is missed")
+	}
+
+	// Add optional Include value
+	if params.Include != "" {
+		if params.Include != "resource_string" {
+			return "", fmt.Errorf("unknown 'Include' value")
+		}
+		paramStr += "&include=resource_string"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
