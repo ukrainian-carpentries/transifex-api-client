@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type ResourceStringComment struct {
@@ -74,10 +75,30 @@ type ResourceStringComment struct {
 	} `json:"relationships"`
 }
 
+type ListResourceStringCommentsParameters struct {
+	Organization          string
+	Project               string
+	Cursor                string
+	Category              string
+	Author                string
+	DatetimeCreatedAfter  time.Time
+	DatetimeCreatedBefore time.Time
+	Priority              string
+	Resource              string
+	ResourceString        string
+	Status                string
+	Type                  string
+}
+
 // Get resource strings collection.
 // Get a list of all resource string comments for an organization. You can further narrow down the list using the available filters.
 // https://developers.transifex.com/reference/get_resource-string-comments
-func (t *TransifexApiClient) ListResourceStringComments(organization_id string) ([]ResourceStringComment, error) {
+func (t *TransifexApiClient) ListResourceStringComments(params ListResourceStringCommentsParameters) ([]ResourceStringComment, error) {
+
+	paramStr, err := t.createListResourceStringCommentsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var rscomm struct {
@@ -95,7 +116,7 @@ func (t *TransifexApiClient) ListResourceStringComments(organization_id string) 
 		strings.Join([]string{
 			t.apiURL,
 			"/resource_string_comments",
-			fmt.Sprintf("?filter[organization]=%s", organization_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -230,3 +251,124 @@ func (t *TransifexApiClient) PrintResourceStringComment(c ResourceStringComment,
 	default:
 	}
 }
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListResourceStringCommentsParametersString(params ListResourceStringCommentsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization option
+	if params.Organization == "" {
+		return "", fmt.Errorf("mandatory parameter 'Organization' is missed")
+	}
+	paramStr += "&filter[organization]=" + params.Organization
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional Project value
+	if params.Project != "" {
+		paramStr += "&filter[project]=" + params.Project
+	}
+
+	// Add optional Category value
+	if params.Category != "" {
+		paramStr += "&filter[category]=" + params.Category
+	}
+
+	// Add optional Author value
+	if params.Author != "" {
+		paramStr += "&filter[author]=" + params.Author
+	}
+
+	// Add optional datetime_created->gte value
+	if (params.DatetimeCreatedAfter != time.Time{}) {
+		paramStr += "&filter[datetime_created][gte]=" + params.DatetimeCreatedAfter.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add optional datetime_created->lt value
+	if (params.DatetimeCreatedBefore != time.Time{}) {
+		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add optional datetime_created->lt value
+	if (params.DatetimeCreatedBefore != time.Time{}) {
+		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
+	}
+
+	// Add allowed Priority option
+	switch strings.ToLower(params.Priority) {
+	case "low":
+		fallthrough
+	case "normal":
+		fallthrough
+	case "high":
+		fallthrough
+	case "critical":
+		fallthrough
+	case "blocker":
+		paramStr += "&filter[priority]=" + strings.ToLower(params.Priority)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'Priority' value")
+	}
+
+	// Add Resource option
+	if params.Resource != "" {
+		paramStr += "&filter[resource]=" + params.Resource
+	}
+
+	// Add Resource String option
+	if params.ResourceString != "" {
+		paramStr += "&filter[resource_string]=" + params.ResourceString
+	}
+
+	// Add allowed Status option
+	switch strings.ToLower(params.Status) {
+	case "open":
+		fallthrough
+	case "resolved":
+		paramStr += "&filter[status]=" + strings.ToLower(params.Status)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'Status' value")
+	}
+
+	// Add allowed Type option
+	switch strings.ToLower(params.Type) {
+	case "issue":
+		fallthrough
+	case "comment":
+		paramStr += "&filter[type]=" + strings.ToLower(params.Type)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'Type' value")
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// type ListResourceStringCommentsParameters struct {
+// 	Organization          string
+// 	Project               string
+// 	Cursor                string
+// 	Category              string
+// 	Author                string
+// 	DatetimeCreatedAfter  time.Time
+// 	DatetimeCreatedBefore time.Time
+// 	Priority              string
+// 	Resource              string
+// 	ResourceString        string
+// 	Status                string
+// 	Type                  string
+// }
