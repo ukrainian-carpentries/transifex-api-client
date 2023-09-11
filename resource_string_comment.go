@@ -296,11 +296,6 @@ func (t *TransifexApiClient) createListResourceStringCommentsParametersString(pa
 		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
 	}
 
-	// Add optional datetime_created->lt value
-	if (params.DatetimeCreatedBefore != time.Time{}) {
-		paramStr += "&filter[datetime_created][lt]=" + params.DatetimeCreatedBefore.Format("2006-01-02T15:04:05Z")
-	}
-
 	// Add allowed Priority option
 	switch strings.ToLower(params.Priority) {
 	case "low":
