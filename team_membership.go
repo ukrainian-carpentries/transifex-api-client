@@ -9,6 +9,21 @@ import (
 	"strings"
 )
 
+type ListTeamMembershipsParameters struct {
+	Organization string
+	Team         string
+	Language     string
+	User         string
+	Role         string
+	Cursor       string
+	Include      string
+}
+
+type GetSingleTeamMembershipParameters struct {
+	TeamMembership string
+	Include        string
+}
+
 type TeamMembership struct {
 	Type       string `json:"type"`
 	ID         string `json:"id"`
@@ -49,13 +64,28 @@ type TeamMembership struct {
 	} `json:"links"`
 }
 
-// Get a list of all resources (in a specific project).
+// List team memberships.
 // https://developers.transifex.com/reference/get_team-memberships
-func (t *TransifexApiClient) ListTeamMemberships(organization_id string) ([]TeamMembership, error) {
+func (t *TransifexApiClient) ListTeamMemberships(params ListTeamMembershipsParameters) ([]TeamMembership, error) {
+
+	paramStr, err := t.createListTeamMembershipsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var tms struct {
-		Data  []TeamMembership `json:"data"`
+		Data     []TeamMembership `json:"data"`
+		Included []struct {
+			ID         string `json:"id"`
+			Type       string `json:"type"`
+			Attributes struct {
+				Username string `json:"username"`
+			} `json:"attributes"`
+			Links struct {
+				Self string `json:"self"`
+			} `json:"links"`
+		} `json:"included"`
 		Links struct {
 			Self     string `json:"self"`
 			Next     string `json:"next"`
@@ -69,7 +99,7 @@ func (t *TransifexApiClient) ListTeamMemberships(organization_id string) ([]Team
 		strings.Join([]string{
 			t.apiURL,
 			"/team_memberships",
-			fmt.Sprintf("?filter[organization]=%s", organization_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -100,7 +130,12 @@ func (t *TransifexApiClient) ListTeamMemberships(organization_id string) ([]Team
 
 // Get single team membership.
 // https://developers.transifex.com/reference/get_team-memberships-team-membership-id
-func (t *TransifexApiClient) GetSingleTeamMembership(team_membership_id string) (TeamMembership, error) {
+func (t *TransifexApiClient) GetSingleTeamMembership(params GetSingleTeamMembershipParameters) (TeamMembership, error) {
+
+	paramStr, err := t.createGetSingleTeamMembershipParametersString(params)
+	if err != nil {
+		return TeamMembership{}, err
+	}
 
 	// Define the variable to decode the service response
 	var tms struct {
@@ -113,7 +148,8 @@ func (t *TransifexApiClient) GetSingleTeamMembership(team_membership_id string) 
 		strings.Join([]string{
 			t.apiURL,
 			"/team_memberships/",
-			team_membership_id,
+			params.TeamMembership,
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -146,7 +182,7 @@ func (t *TransifexApiClient) GetSingleTeamMembership(team_membership_id string) 
 func (t *TransifexApiClient) PrintTeamMembership(tm TeamMembership, formatter string) {
 
 	switch formatter {
-		
+
 	case "text":
 		fmt.Printf("Team membership information:\n")
 		fmt.Printf("  Type: %v\n", tm.Type)
@@ -183,4 +219,93 @@ func (t *TransifexApiClient) PrintTeamMembership(tm TeamMembership, formatter st
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListTeamMembershipsParametersString(params ListTeamMembershipsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization option
+	if params.Organization == "" {
+		return "", fmt.Errorf("mandatory parameter 'Organization' is missed")
+	}
+	paramStr += "&filter[organization]=" + params.Organization
+
+	// Add optional Team value
+	if params.Team != "" {
+		paramStr += "&filter[team]=" + params.Team
+	}
+
+	// Add optional Language value
+	if params.Language != "" {
+		paramStr += "&filter[language]=" + params.Language
+	}
+
+	// Add optional User value
+	if params.User != "" {
+		paramStr += "&filter[user]=" + params.User
+	}
+
+	// Add optional Role value
+	switch strings.ToLower(params.Role) {
+	case "coordinator":
+		fallthrough
+	case "translator":
+		fallthrough
+	case "reviewer":
+		paramStr += "&filter[role]=" + strings.ToLower(params.Role)
+	case "":
+	default:
+		return "", fmt.Errorf("unknown 'Origin' value")
+	}
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional Include value
+	if params.Include != "" {
+		if params.Include != "user" {
+			return "", fmt.Errorf("unknown 'Include' value")
+		}
+		paramStr += "&include=user"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetSingleTeamMembershipParametersString(params GetSingleTeamMembershipParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory TeamMembership option
+	if params.TeamMembership == "" {
+		return "", fmt.Errorf("mandatory parameter 'TeamMembership' is missed")
+	}
+
+	// Add optional Include value
+	if params.Include != "" {
+		if params.Include != "user" {
+			return "", fmt.Errorf("unknown 'Include' value")
+		}
+		paramStr += "&include=user"
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
