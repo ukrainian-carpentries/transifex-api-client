@@ -357,18 +357,3 @@ func (t *TransifexApiClient) createListResourceStringCommentsParametersString(pa
 
 	return paramStr, nil
 }
-
-// type ListResourceStringCommentsParameters struct {
-// 	Organization          string
-// 	Project               string
-// 	Cursor                string
-// 	Category              string
-// 	Author                string
-// 	DatetimeCreatedAfter  time.Time
-// 	DatetimeCreatedBefore time.Time
-// 	Priority              string
-// 	Resource              string
-// 	ResourceString        string
-// 	Status                string
-// 	Type                  string
-// }
