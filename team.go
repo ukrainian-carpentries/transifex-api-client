@@ -83,9 +83,31 @@ type TeamManagerRelationship struct {
 	} `json:"links"`
 }
 
+type ListTeamsParameters struct {
+	Organization string
+	Cursor       string
+	Slug         string
+	Name         string
+}
+
+type GetTeamManagersParameters struct {
+	Team   string
+	Cursor string
+}
+
+type GetTeamManagerRelationshipsParameters struct {
+	Team   string
+	Cursor string
+}
+
 // Get the list of teams that belong to a single organization.
 // https://developers.transifex.com/reference/get_teams
-func (t *TransifexApiClient) ListTeams(organization_id string) ([]Team, error) {
+func (t *TransifexApiClient) ListTeams(params ListTeamsParameters) ([]Team, error) {
+
+	paramStr, err := t.createListTeamsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var ts struct {
@@ -103,7 +125,7 @@ func (t *TransifexApiClient) ListTeams(organization_id string) ([]Team, error) {
 		strings.Join([]string{
 			t.apiURL,
 			"/teams",
-			fmt.Sprintf("?filter[organization]=%s", organization_id),
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -178,7 +200,12 @@ func (t *TransifexApiClient) GetTeamDetail(team_id string) (Team, error) {
 
 // Get the managers of a team.
 // https://developers.transifex.com/reference/get_teams-team-id-managers
-func (t *TransifexApiClient) GetTeamManagers(team_id string) ([]TeamManager, error) {
+func (t *TransifexApiClient) GetTeamManagers(params GetTeamManagersParameters) ([]TeamManager, error) {
+
+	paramStr, err := t.createGetTeamManagersParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 
 	// Define the variable to decode the service response
 	var tms struct {
@@ -196,8 +223,9 @@ func (t *TransifexApiClient) GetTeamManagers(team_id string) ([]TeamManager, err
 		strings.Join([]string{
 			t.apiURL,
 			"/teams/",
-			team_id,
+			params.Team,
 			"/managers",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -228,8 +256,12 @@ func (t *TransifexApiClient) GetTeamManagers(team_id string) ([]TeamManager, err
 
 // Get team manager relationships.
 // https://developers.transifex.com/reference/get_teams-team-id-relationships-managers
-func (t *TransifexApiClient) GetTeamManagerRelationships(team_id string) ([]TeamManagerRelationship, error) {
+func (t *TransifexApiClient) GetTeamManagerRelationships(params GetTeamManagerRelationshipsParameters) ([]TeamManagerRelationship, error) {
 
+	paramStr, err := t.createGetTeamManagerRelationshipsParametersString(params)
+	if err != nil {
+		return nil, err
+	}
 	// Define the variable to decode the service response
 	var tmrs struct {
 		Data  []TeamManagerRelationship `json:"data"`
@@ -246,8 +278,9 @@ func (t *TransifexApiClient) GetTeamManagerRelationships(team_id string) ([]Team
 		strings.Join([]string{
 			t.apiURL,
 			"/teams/",
-			team_id,
+			params.Team,
 			"/relationships/managers",
+			paramStr,
 		}, ""),
 		bytes.NewBuffer(nil))
 	if err != nil {
@@ -315,4 +348,93 @@ func (t *TransifexApiClient) PrintTeam(tt Team, formatter string) {
 
 	default:
 	}
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createListTeamsParametersString(params ListTeamsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Organization option
+	if params.Organization == "" {
+		return "", fmt.Errorf("mandatory parameter 'Organization' is missed")
+	}
+	paramStr += "&filter[organization]=" + params.Organization
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Add optional Slug value
+	if params.Slug != "" {
+		paramStr += "&filter[slug]=" + params.Slug
+	}
+
+	// Add optional Name value
+	if params.Name != "" {
+		paramStr += "&filter[name]=" + params.Name
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetTeamManagersParametersString(params GetTeamManagersParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Team option
+	if params.Team == "" {
+		return "", fmt.Errorf("mandatory parameter 'Team' is missed")
+	}
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
+}
+
+// The function checks the input set of parameters and converts it into a valid URL parameters string
+func (t *TransifexApiClient) createGetTeamManagerRelationshipsParametersString(params GetTeamManagerRelationshipsParameters) (string, error) {
+	// Initialize the parameters string
+	paramStr := ""
+
+	// Add mandatory Team option
+	if params.Team == "" {
+		return "", fmt.Errorf("mandatory parameter 'Team' is missed")
+	}
+
+	// Add optional Cursor value (from the previous response!)
+	// The cursor used for pagination.
+	// The value of the cursor must be retrieved from pagination links included in previous responses;
+	// you should not attempt to write them on your own.
+	if params.Cursor != "" {
+		paramStr += "&page[cursor]=" + params.Cursor
+	}
+
+	// Replace the & with ? symbol if the string is not empty
+	if len(paramStr) > 0 {
+		paramStr = "?" + strings.TrimPrefix(paramStr, "&")
+	}
+
+	return paramStr, nil
 }
